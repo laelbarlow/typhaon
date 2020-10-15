@@ -1,0 +1,6 @@
+name: muscle
+channels:
+    - bioconda
+dependencies:
+    - python=3.8
+    - trimal=1.4.1

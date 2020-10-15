@@ -1,0 +1,7 @@
+name: modelfinder
+channels:
+    - bioconda
+dependencies:
+    - python=3.8
+    - iqtree=1.6.12
+    #- iqtree=2.0.3

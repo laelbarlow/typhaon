@@ -1,0 +1,6 @@
+name: iqtree_ultrafast
+channels:
+    - bioconda
+dependencies:
+    - python=3.8
+    - iqtree=2.0.3

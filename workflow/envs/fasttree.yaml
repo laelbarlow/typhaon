@@ -1,0 +1,6 @@
+name: muscle
+channels:
+    - bioconda
+dependencies:
+    - python=3.8
+    - fasttree=2.1.10

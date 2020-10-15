@@ -1,0 +1,12 @@
+name: render_tree_images
+channels:
+    - etetoolkit
+    - anaconda
+    - conda-forge
+dependencies:
+    - python=3.8
+    - ete3=3.1.2
+    - numpy
+    - reportlab
+    - matplotlib
+    - PyPDF2

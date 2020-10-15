@@ -1,0 +1,7 @@
+name: name_replace
+channels:
+    - etetoolkit
+dependencies:
+    - python=3.8
+    - ete3=3.1.2
+

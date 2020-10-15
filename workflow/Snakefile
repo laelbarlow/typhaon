@@ -1,0 +1,573 @@
+"""
+SnakeMake workflow definition file.
+
+"""
+import os
+import shutil
+import glob
+from snakemake.io import expand, glob_wildcards
+
+# Define input file paths.
+input_fasta_dirs = glob.glob(os.path.join('resources', '*_FASTA'))
+fasta_names = [os.path.basename(x).rsplit('_', 1)[0] \
+                for x in input_fasta_dirs]
+input_fasta_files = glob.glob(os.path.join(
+                                  os.path.join('resources',
+                                               '*_FASTA'), 
+                                  '*.faa'))
+
+
+rule final_results:
+    """
+    Get output files from full analysis.
+    """
+    input:
+        #expand('results/concat_fasta/{fasta_name}.faa', \
+        #    fasta_name = fasta_names),
+        #expand('results/nonredun_fasta/{fasta_name}.faa', \
+        #    fasta_name = fasta_names),
+        #expand('results/aligned_fasta/{fasta_name}.afaa', \
+        #    fasta_name = fasta_names),
+        #expand('results/trimmed_fasta/{fasta_name}.afaa', \
+        #    fasta_name = fasta_names),
+        #expand('results/fasttree_newick/{fasta_name}.tre', \
+        #    fasta_name = fasta_names),
+        #expand('results/modelfinder_output/{fasta_name}.iqtree', \
+        #    fasta_name = fasta_names),
+        expand('results/fasttree_pdf/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
+        #expand('results/modelfinder_output/{fasta_name}.txt', \
+        #    fasta_name = fasta_names),
+        #expand('results/iqtree_ultrafast_newick/{fasta_name}.treefile', \
+        #    fasta_name = fasta_names),
+        expand('results/iqtree_ultrafast_pdf/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
+        #expand('results/trimmed_fasta_coded/{fasta_name}.afaa', \
+        #    fasta_name = fasta_names),
+        #expand('results/trimmed_phylip_coded/{fasta_name}.phy', \
+        #    fasta_name = fasta_names),
+        expand('results/phylobayes_output/{fasta_name}_chain_1.treelist', \
+            fasta_name = fasta_names),
+        expand('results/phylobayes_output/{fasta_name}_chain_2.treelist', \
+            fasta_name = fasta_names),
+        expand('results/phylobayes_output/{fasta_name}_bpcomp_output.con.tre', \
+            fasta_name = fasta_names),
+        expand('results/phylobayes_pdf/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
+        'results/workflow_diagram.pdf'
+
+
+rule help:
+    """
+    Print list of all targets with help.
+    """
+    run:
+        for rule in workflow.rules:
+            print(rule.name)
+            print(rule.docstring)
+
+
+rule quick_trees:
+    """
+    Get output files from partial analysis.
+    """
+    input:
+        expand('results/fasttree_pdf/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
+        expand('results/iqtree_ultrafast_pdf/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
+        'results/workflow_diagram.pdf'
+
+
+rule collect_seqs:
+    """
+    """
+    input:
+        files = input_fasta_files,
+        fasta_dir = 'resources/{fasta_name}_FASTA'
+
+    output:
+        concat_fasta_file = 'results/concat_fasta/{fasta_name}.faa'
+
+    shell:
+        """
+        for X in {input.fasta_dir}/*.faa; do cat $X >> {output.concat_fasta_file}; done
+        """
+
+
+#rule clean_unexpected_chars:
+#    """
+#    """
+#    input:
+#
+#    output:
+#
+#    shell:
+#        """
+#        """
+#
+
+
+rule cdhit:
+    """
+    ***Need to customize parameters! 
+    """
+    input:
+        concat_fasta_file = 'results/concat_fasta/{fasta_name}.faa'
+
+    output:
+        nonredun_fasta_file = 'results/nonredun_fasta/{fasta_name}.faa'
+
+    conda:
+        'envs/cdhit.yaml'
+
+    shell:
+        """
+        cd-hit -i {input.concat_fasta_file} -o {output.nonredun_fasta_file} \
+            -c 1.0 
+        """
+
+rule muscle:
+    """
+    """
+    input:
+        nonredun_fasta_file = 'results/nonredun_fasta/{fasta_name}.faa'
+
+    output:
+        aligned_fasta_file = 'results/aligned_fasta/{fasta_name}.afaa'
+
+    conda:
+        'envs/muscle.yaml'
+
+    shell:
+        """
+        muscle -in {input.nonredun_fasta_file} \
+               -out {output.aligned_fasta_file}
+        """
+
+rule trimal:
+    """
+    """
+    input:
+        aligned_fasta_file = 'results/aligned_fasta_coded/{fasta_name}.afaa'
+
+    output:
+        trimmed_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+
+    conda:
+        'envs/trimal.yaml'
+
+    shell:
+        """
+        #trimal -in {input.aligned_fasta_file} -out {output.trimmed_fasta_file} -gappyout
+        #trimal -in {input.aligned_fasta_file} -out {output.trimmed_fasta_file} -automated1
+        trimal \
+            -in {input.aligned_fasta_file} \
+            -out {output.trimmed_fasta_file} \
+            -htmlout \
+                $(echo {output.trimmed_fasta_file} | cut -f 1 -d '.')'_trimming_record.html' \
+            -gt 0.6 
+
+        """
+
+
+rule afa_to_phy:
+    """
+    Convert aligned FASTA files to PHYLIP format.
+
+    Necessary for Phylobayes.
+
+    """
+    input:
+        script = 'workflow/scripts/afa_to_phy.py',
+        trimmed_fasta_coded_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+
+    output:
+        phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
+
+    conda:
+        'envs/afa_to_phy.yaml'
+
+    shell:
+        """
+        python3 {input.script} {input.trimmed_fasta_coded_file} {output.phylip_file}
+        """
+
+
+rule modelfinder:
+    """
+
+    ModelFinder Citation:
+
+    S. Kalyaanamoorthy, B.Q. Minh, T.K.F. Wong, A. von Haeseler, and L.S.
+    Jermiin (2017) ModelFinder: fast model selection for accurate phylogenetic
+    estimates.Nat. Methods, 14:587–589. DOI:10.1038/nmeth.4285
+    """
+    input:
+        trimmed_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+
+    output:
+        model_file = 'results/modelfinder_output/{fasta_name}.iqtree'
+
+    conda:
+        'envs/modelfinder.yaml'
+
+    shell:
+        """
+        iqtree \
+              -s {input.trimmed_fasta_file} \
+              -pre $(echo {output.model_file} | cut -f 1 -d '.') \
+              -m MF \
+              -madd C10,C20,C30,C40,C50,C60,LG4X,LG4M
+        """
+
+
+rule parse_modelfinder:
+    """
+    """
+    input:
+        model_file = 'results/modelfinder_output/{fasta_name}.iqtree'
+
+    output:
+        model_text_file = 'results/modelfinder_output/{fasta_name}.txt'
+
+    run:
+        model_code = None
+        with open(input.model_file) as infh:
+            for i in infh:
+                if i.startswith('Best-fit model according to BIC'):
+                    model_code = i.rsplit(' ', 1)[1]
+                    break
+        assert model_code is not None
+        with open(output.model_text_file, 'w') as o:
+            o.write(model_code)
+
+
+rule fasttree:
+    """
+    """
+    input:
+        trimmed_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+
+    output:
+        newick_tree_file = 'results/fasttree_newick_coded/{fasta_name}.tre'
+
+    conda:
+        'envs/fasttree.yaml'
+
+    shell:
+        """
+        fasttree -out {output.newick_tree_file} {input.trimmed_fasta_file}
+        """
+
+
+rule visualize_fasttree:
+    """
+    """
+    input:
+        script = 'workflow/scripts/visualize_fasttree.py',
+        tree_newick = 'results/fasttree_newick_decoded/{fasta_name}.tre'
+
+    output:
+        tree_pdf = 'results/fasttree_pdf/{fasta_name}.pdf'
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        python3 {input.script} {input.tree_newick} {output.tree_pdf}
+        """
+
+
+rule code_names:
+    """
+    Take trimmed alignment files and convert sequence names to short
+    alphanumeric codes.
+
+    Necessary before converting to PHYLIP format (for Phylobayes, etc.).
+    """
+    input:
+        script = 'workflow/scripts/code_names.py',
+        fasta_file = 'results/aligned_fasta/{fasta_name}.afaa'
+
+    output:
+        coded_fasta_file = 'results/aligned_fasta_coded/{fasta_name}.afaa',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.fasta_file} \
+                    {output.coded_fasta_file} \
+                    {output.conversion_table_file} 
+        """
+
+
+rule decode_iqtree_ultrafast_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file = \
+        'results/iqtree_ultrafast_newick/{fasta_name}.treefile',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        decoded_newick_file = 'results/iqtree_ultrafast_newick_decoded/{fasta_name}.treefile'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
+                    {input.conversion_table_file} 
+        """
+
+rule decode_pb_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file =\
+        'results/phylobayes_output/{fasta_name}_bpcomp_output.con.tre',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        decoded_newick_file =\
+        'results/phylobayes_newick_decoded/{fasta_name}_bpcomp_output.con.tre'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
+                    {input.conversion_table_file} 
+        """
+
+
+rule decode_fasttree_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file = \
+        'results/fasttree_newick_coded/{fasta_name}.tre',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        decoded_newick_file = 'results/fasttree_newick_decoded/{fasta_name}.tre'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
+                    {input.conversion_table_file} 
+        """
+
+
+
+rule iqtree_ultrafast:
+    """
+
+    Ultrafast Bootstrapping Citation:
+
+    D.T. Hoang, O. Chernomor, A. von Haeseler, B.Q. Minh, and L.S. Vinh (2018)
+    UFBoot2: Improving the ultrafast bootstrap approximation. Mol.  Biol.
+    Evol., 35:518–522. https://doi.org/10.1093/molbev/msx281
+    """
+    input:
+        phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy',
+        model_text_file = 'results/modelfinder_output/{fasta_name}.txt'
+
+    output:
+        newick_tree_file = 'results/iqtree_ultrafast_newick/{fasta_name}.treefile'
+
+    conda:
+        'envs/iqtree_ultrafast.yaml'
+
+    shell:
+        """
+        iqtree \
+            -s {input.phylip_file} \
+            -m $(cat {input.model_text_file}) \
+            -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
+            -B 1000
+        """
+
+
+rule visualize_iqtree_ultrafast:
+    """
+    """
+    input:
+        script = 'workflow/scripts/visualize_fasttree.py',
+        tree_newick = 'results/iqtree_ultrafast_newick_decoded/{fasta_name}.treefile'
+
+    output:
+        tree_pdf = 'results/iqtree_ultrafast_pdf/{fasta_name}.pdf'
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        python3 {input.script} {input.tree_newick} {output.tree_pdf}
+        """
+
+rule visualize_pb:
+    """
+    """
+    input:
+        script = 'workflow/scripts/visualize_fasttree.py',
+        tree_newick =\
+        'results/phylobayes_newick_decoded/{fasta_name}_bpcomp_output.con.tre'
+
+    output:
+        tree_pdf = 'results/phylobayes_pdf/{fasta_name}.pdf'
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        python3 {input.script} {input.tree_newick} {output.tree_pdf}
+        """
+
+
+#rule iqtree_nonparam:
+#    """
+#    """
+#    input:
+#
+#    output:
+#
+#    shell:
+#        """
+#        """
+#
+
+
+rule pb_chain_one:
+    """
+    Requires Phylobayes version 1.4c executable files to be in the $PATH, so
+    that they can be called from the commandline.
+
+    Phylobayes can be downloaded here:
+    http://www.atgc-montpellier.fr/phylobayes/
+
+    Phylobayes citations:
+
+    Lartillot, N., Philippe, H., 2004. A Bayesian Mixture Model for Across-Site
+    Heterogeneities in the Amino-Acid Replacement Process. Molecular Biology
+    and Evolution 21, 1095–1109. https://doi.org/10.1093/molbev/msh112
+
+    """
+    input:
+        phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
+
+    output:
+        topology_file =\
+        'results/phylobayes_output/{fasta_name}_chain_1.treelist'
+
+    shell:
+        """
+        pb -d {input.phylip_file} \
+           -x 5 100 \
+           -catfix C20 \
+           $(echo {output.topology_file} | cut -f 1 -d '.')
+        """
+
+
+rule pb_chain_two:
+    """
+    Requires Phylobayes version 1.4c executable files to be in the $PATH, so
+    that they can be called from the commandline.
+
+    Phylobayes can be downloaded here:
+    http://www.atgc-montpellier.fr/phylobayes/
+
+    Phylobayes citations:
+
+    Lartillot, N., Philippe, H., 2004. A Bayesian Mixture Model for Across-Site
+    Heterogeneities in the Amino-Acid Replacement Process. Molecular Biology
+    and Evolution 21, 1095–1109. https://doi.org/10.1093/molbev/msh112
+
+    """
+    input:
+        phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
+
+    output:
+        topology_file =\
+        'results/phylobayes_output/{fasta_name}_chain_2.treelist'
+
+    shell:
+        """
+        pb -d {input.phylip_file} \
+           -x 1 200 \
+           -catfix C20 \
+           $(echo {output.topology_file} | cut -f 1 -d '.')
+        """
+
+
+rule trace_pb_chains:
+    """
+    """
+    input:
+        topology_file_1 =\
+        'results/phylobayes_output/{fasta_name}_chain_1.treelist',
+        topology_file_2 =\
+        'results/phylobayes_output/{fasta_name}_chain_2.treelist'
+
+    output:
+        consensus_tree =\
+        'results/phylobayes_output/{fasta_name}_bpcomp_output.con.tre'
+
+    shell:
+        """
+        bpcomp \
+            -x 20 1 \
+            -c 0.0 \
+            -o $(echo {output.consensus_tree} | cut -f 1 -d '.') \
+            $(echo {input.topology_file_1} | cut -f 1 -d '.') \
+            $(echo {input.topology_file_2} | cut -f 1 -d '.')
+        """
+
+
+rule plot_workflow:
+    """
+    Plot the snakemake workflow defined in the Snakefile file.
+    """
+    output:
+        pdf = 'results/workflow_diagram.pdf',
+        png = 'images/workflow_diagram.png'
+    shell: 
+        #'snakemake --cores 1 -p --rulegraph | dot -Tpdf > {output}'
+        #snakemake --cores 1 -p --filegraph | dot -Tpdf > {output.pdf} && \
+        #snakemake --cores 1 -p --filegraph | dot -Tpng > {output.png}
+        """
+        snakemake --cores 1 -p --rulegraph | dot -Tpdf > {output.pdf} && \
+        snakemake --cores 1 -p --rulegraph | dot -Tpng > {output.png}
+        """
+

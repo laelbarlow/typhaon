@@ -1,0 +1,6 @@
+name: muscle
+channels:
+    - bioconda
+dependencies:
+    - python=3.8
+    - muscle=3.8.1551
