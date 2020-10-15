@@ -1,5 +1,5 @@
 
-# Protein Family Phylogenetics Workflow
+# Typhaon: A workflow for phylogentic analysis of protein families
 
 
 ## Objectives
