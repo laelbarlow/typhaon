@@ -159,3 +159,24 @@ def write_newick_tree_with_coded_names(infile, outfile, tablefile,
         o.write(tree_string)
 
 
+def write_decoded_fasta_alignment(infile, outfile, tablefile):
+    """Take an alignment in FASTA format and a conversion table, and write a
+    new FASTA alignment with headers decoded.
+    """
+    # Generate a dictionary for converting names.
+    conv_dict = get_conversion_dict_from_table(tablefile)
+
+    # Iterate over lines in input alignment, writing modified headers.
+    with open(infile) as infh, open(outfile, 'w') as o:
+        for i in infh:
+            if i.startswith('>'):
+                found = False
+                for x in conv_dict.keys():
+                    if x in i:
+                        found = True
+                        o.write(i.replace(x, conv_dict[x]))
+                assert found, """Could not decode header:\n\t%s""" % i
+            else:
+                o.write(i)
+    
+

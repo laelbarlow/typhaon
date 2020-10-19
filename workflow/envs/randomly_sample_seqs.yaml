@@ -1,0 +1,7 @@
+name: randomly_sample_seqs
+channels:
+    - anaconda
+dependencies:
+    - python=3.8
+    - biopython=1.78
+

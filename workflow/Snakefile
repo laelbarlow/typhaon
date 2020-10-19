@@ -1,6 +1,25 @@
 """
 SnakeMake workflow definition file.
 
+To-Do:
+
+    Write a rule to apply a method similar to TreeTrimmer for after IQ-TREE
+    ultrafast bootstrapping, but before nonparametric bootstrapping and
+    PhyloBayes.
+        Maruyama, S., Eveleigh, R.J., Archibald, J.M., 2013. Treetrimmer: a
+        method for phylogenetic dataset size reduction. BMC Res Notes 6, 145.
+        https://doi.org/10.1186/1756-0500-6-145
+
+    Write a rule to apply the HmmCleaner method to trim alignment:
+        Di Franco, A., Poujol, R., Baurain, D., Philippe, H., 2019. Evaluating
+        the usefulness of alignment filtering methods to reduce the impact of
+        errors on evolutionary inferences. BMC Evol Biol 19, 21.
+        https://doi.org/10.1186/s12862-019-1350-2
+
+    Add Gblocks as another alternative method for trimming alignments?
+
+
+
 """
 import os
 import shutil
@@ -46,15 +65,20 @@ rule final_results:
         #    fasta_name = fasta_names),
         #expand('results/trimmed_phylip_coded/{fasta_name}.phy', \
         #    fasta_name = fasta_names),
-        expand('results/phylobayes_output/{fasta_name}_chain_1.treelist', \
-            fasta_name = fasta_names),
-        expand('results/phylobayes_output/{fasta_name}_chain_2.treelist', \
-            fasta_name = fasta_names),
+        #expand('results/phylobayes_output/{fasta_name}_chain_1.treelist', \
+        #    fasta_name = fasta_names),
+        #expand('results/phylobayes_output/{fasta_name}_chain_2.treelist', \
+        #    fasta_name = fasta_names),
         expand('results/phylobayes_output/{fasta_name}_bpcomp_output.con.tre', \
             fasta_name = fasta_names),
         expand('results/phylobayes_pdf/{fasta_name}.pdf', \
             fasta_name = fasta_names),
+        expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
+            fasta_name = fasta_names),
         'results/workflow_diagram.pdf'
+
+
+        
 
 
 rule help:
@@ -67,32 +91,28 @@ rule help:
             print(rule.docstring)
 
 
-rule quick_trees:
+rule superfast_fasttree:
     """
     Get output files from partial analysis.
     """
     input:
         expand('results/fasttree_pdf/{fasta_name}.pdf', \
             fasta_name = fasta_names),
-        expand('results/iqtree_ultrafast_pdf/{fasta_name}.pdf', \
+        expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
             fasta_name = fasta_names),
         'results/workflow_diagram.pdf'
 
 
-rule collect_seqs:
+rule ultrafast_iqtree:
     """
+    Get output files from partial analysis.
     """
     input:
-        files = input_fasta_files,
-        fasta_dir = 'resources/{fasta_name}_FASTA'
-
-    output:
-        concat_fasta_file = 'results/concat_fasta/{fasta_name}.faa'
-
-    shell:
-        """
-        for X in {input.fasta_dir}/*.faa; do cat $X >> {output.concat_fasta_file}; done
-        """
+        expand('results/iqtree_ultrafast_pdf/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
+        expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
+            fasta_name = fasta_names),
+        'results/workflow_diagram.pdf'
 
 
 #rule clean_unexpected_chars:
@@ -108,15 +128,86 @@ rule collect_seqs:
 #
 
 
-rule cdhit:
+rule cdhit_subsets:
     """
     ***Need to customize parameters! 
     """
     input:
-        concat_fasta_file = 'results/concat_fasta/{fasta_name}.faa'
+        files = input_fasta_files,
+        fasta_dir = 'resources/{fasta_name}_FASTA'
 
     output:
-        nonredun_fasta_file = 'results/nonredun_fasta/{fasta_name}.faa'
+        fasta_dir = directory('results/reduced_subsets_fasta/{fasta_name}_FASTA')
+
+    conda:
+        'envs/cdhit.yaml'
+
+    shell:
+        """
+        mkdir -p {output.fasta_dir} && \
+        for X in {input.fasta_dir}/*.faa; do 
+            cd-hit -i $X -o {output.fasta_dir}/$( basename $X ) \
+                -n 5 \
+                -c 0.70 \
+            ; done
+
+        """
+
+
+rule randomly_sample_seqs:
+    """
+    Randomly sample a given maximum number of sequences (without replacement)
+    from each input FASTA file. A seed number is specified for random sampling,
+    so sampling is reproducible.
+    """
+    input:
+        script = 'workflow/scripts/randomly_sample_seqs.py',
+        fasta_dir = 'results/reduced_subsets_fasta/{fasta_name}_FASTA'
+
+    output:
+        fasta_dir =\
+        directory('results/reduced_subsets_samples_fasta/{fasta_name}_FASTA')
+
+    conda:
+        'envs/randomly_sample_seqs.yaml'
+
+    shell:
+        """
+        # (First argument is sample size.)
+        # (Second argument is seed for random sampling.)
+
+        python3 {input.script} \
+                    20 \
+                    54321 \
+                    {input.fasta_dir} \
+                    {output.fasta_dir}
+        """
+
+
+rule combine_seqs:
+    """
+    """
+    input:
+        fasta_dir = 'results/reduced_subsets_samples_fasta/{fasta_name}_FASTA'
+
+    output:
+        concat_fasta_file = 'results/combined_fasta/{fasta_name}.faa'
+
+    shell:
+        """
+        for X in {input.fasta_dir}/*.faa; do cat $X >> {output.concat_fasta_file}; done
+        """
+
+
+rule cdhit_combined:
+    """
+    ***Need to customize parameters! 
+    """
+    input:
+        concat_fasta_file = 'results/combined_fasta/{fasta_name}.faa'
+
+    output:
+        nonredun_fasta_file = 'results/reduced_combined_fasta/{fasta_name}.faa'
 
     conda:
         'envs/cdhit.yaml'
@@ -124,14 +215,14 @@ rule cdhit:
     shell:
         """
         cd-hit -i {input.concat_fasta_file} -o {output.nonredun_fasta_file} \
-            -c 1.0 
+            -c 0.90
         """
 
 rule muscle:
     """
     """
     input:
-        nonredun_fasta_file = 'results/nonredun_fasta/{fasta_name}.faa'
+        nonredun_fasta_file = 'results/reduced_combined_fasta/{fasta_name}.faa'
 
     output:
         aligned_fasta_file = 'results/aligned_fasta/{fasta_name}.afaa'
@@ -145,7 +236,8 @@ rule muscle:
                -out {output.aligned_fasta_file}
         """
 
-rule trimal:
+
+rule trimal_trim:
     """
     """
     input:
@@ -166,7 +258,36 @@ rule trimal:
             -out {output.trimmed_fasta_file} \
             -htmlout \
                 $(echo {output.trimmed_fasta_file} | cut -f 1 -d '.')'_trimming_record.html' \
-            -gt 0.6 
+            -gt 0.5 
+
+        """
+
+
+rule trimal_reduce_seqs:
+    """
+    """
+    input:
+        aligned_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+
+    output:
+        trimmed_fasta_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
+
+    conda:
+        'envs/trimal.yaml'
+
+    shell:
+        """
+        trimal \
+            -in {input.aligned_fasta_file} \
+            -out {output.trimmed_fasta_file} \
+            -htmlout \
+                $(echo {output.trimmed_fasta_file} | cut -f 1 -d '.')'_trimming_record.html' \
+                -resoverlap 0.0 \
+                -seqoverlap 0
+
+        #-clusters 100
+        #-resoverlap 0.0 \
+        #-seqoverlap 0
 
         """
 
@@ -180,7 +301,7 @@ rule afa_to_phy:
     """
     input:
         script = 'workflow/scripts/afa_to_phy.py',
-        trimmed_fasta_coded_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+        trimmed_fasta_coded_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
 
     output:
         phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
@@ -247,7 +368,7 @@ rule fasttree:
     """
     """
     input:
-        trimmed_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
 
     output:
         newick_tree_file = 'results/fasttree_newick_coded/{fasta_name}.tre'
@@ -304,6 +425,32 @@ rule code_names:
                     {input.fasta_file} \
                     {output.coded_fasta_file} \
                     {output.conversion_table_file} 
+        """
+
+
+rule decode_alignment:
+    """
+    Decode names in alignment files.
+    """
+    input:
+        script = 'workflow/scripts/decode_names_in_alignment.py',
+        alignment = \
+        'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        alignment = \
+        'results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.alignment} \
+                    {output.alignment} \
+                    {input.conversion_table_file} 
         """
 
 
