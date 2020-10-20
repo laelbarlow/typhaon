@@ -35,6 +35,8 @@ input_fasta_files = glob.glob(os.path.join(
                                                '*_FASTA'), 
                                   '*.faa'))
 
+localrules: final_results, help, superfast_fasttree, ultrafast_iqtree
+
 
 rule final_results:
     """
