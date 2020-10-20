@@ -2,8 +2,51 @@
 
 SHELL=/bin/bash
 
+install:
+	bash scripts/install.sh
+
+pull:
+	bash scripts/singularity_pull.sh
+
+dry_run:
+	bash scripts/dry_run.sh
+
+run_superfast_fasttree:
+	nohup bash scripts/run_superfast_fasttree.sh & echo $$! > pid_nohup.txt
+
+run_ultrafast_iqtree:
+	nohup bash scripts/run_ultrafast_iqtree.sh & echo $$! > pid_nohup.txt
+
+run:
+	nohup bash scripts/run_workflow.sh & echo $$! > pid_nohup.txt
+
+archive:
+	nohup bash scripts/archive_workflow.sh & echo $$! > pid_nohup.txt
+
+killall:
+	kill -9 `cat pid_nohup.txt`
+	rm pid_nohup.txt
+	killall -TERM snakemake
+	echo Jobs may still be running on the cluster. Cancel those manually, if necessary.
+
+clean:
+	-rm nohup.out
+	-rm pid_nohup.txt
+	-rm slurm*
+
 clean_results:
 	rm -rf results/*
+
+clean_virtualenvs:
+	bash scripts/clean_virtualenvs.sh
+
+unlock:
+	bash scripts/unlock_workflow.sh
+
+uninstall:
+	bash scripts/uninstall.sh
+
+
 
 .PHONY: list
 list:
