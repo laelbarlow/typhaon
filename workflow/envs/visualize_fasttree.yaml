@@ -5,6 +5,7 @@ channels:
     - conda-forge
 dependencies:
     - python=3.8
+    - xvfbwrapper=0.2.9
     - ete3=3.1.2
     - numpy
     - reportlab

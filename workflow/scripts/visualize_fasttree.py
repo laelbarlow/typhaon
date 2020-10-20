@@ -26,6 +26,7 @@ import colorsys
 import matplotlib
 from matplotlib.pyplot import imread
 import matplotlib.pyplot as plt
+from xvfbwrapper import Xvfb
 
 def customize_node_styles_for_visualization(t):
     """Take an ete3 tree object , and modify the node styles for better
@@ -183,7 +184,14 @@ if __name__ == '__main__':
 
 
     # Write tree to pdf.
-    t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
+    vdisplay = Xvfb()
+    vdisplay.start()
+    try:
+        t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
+    finally:
+        vdisplay.stop()
+
+    # Check that PDF was written.
     assert os.path.isfile(output_file_path)
 
     ## Make a copy for markup.
