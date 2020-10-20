@@ -2,5 +2,4 @@ name: phylobayes_mpi
 channels:
     - bioconda
 dependencies:
-    - python=3.8
     - phylobayes-mpi=1.8b
