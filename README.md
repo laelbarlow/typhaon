@@ -9,6 +9,7 @@ results for one or more sets of predicted peptide sequences for homologous
 genes (that is, genes that all encode at least one shared homologous domain),
 including summary of topology and branch supports in a figure.
 
+
 ## Rationale
 
 - In the absence of major sequence alignment errors, all standard phylogetic
@@ -17,13 +18,13 @@ including summary of topology and branch supports in a figure.
 - Performing phylogenetic analysis programmatically, especially using the
   Snakemake workflow manager, helps make analyses reproducible.
 
+
 ## Assumptions regarding input sequences
 
-- All input sequences are in FASTA format with headers formatted with species
-  name followed by '\_\_' followed by sequence ID.
 - All input sequence file names end with the extension '.faa'.
 - All sequences within sets input for alignment share homology, at least in
   some significant subsequence. 
+
 
 ## Software requirements
 
@@ -33,6 +34,7 @@ including summary of topology and branch supports in a figure.
   have this on your personal computer).
 - Pre-installed software (not installed via Conda):
     - Phylobayes.
+
 
 ## Overview of programmed workflow steps
 
@@ -46,7 +48,12 @@ including summary of topology and branch supports in a figure.
 - Clone the code repository from github to your computer by running the
   following command in your terminal:
   ```
-  git clone ...
+  git clone https://github.com/laelbarlow/typhaon.git
+  ```
+
+- Change directories into the cloned repository:
+  ```
+  cd typhaon
   ```
 
 - Check that the Conda package manager is installed:
