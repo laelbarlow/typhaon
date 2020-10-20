@@ -592,7 +592,10 @@ rule iqtree_standard:
         model_text_file = 'results/modelfinder_output/{fasta_name}.txt'
 
     output:
-        newick_tree_file = 'results/iqtree_standard_newick/{fasta_name}.treefile'
+        newick_tree_file =\
+        'results/iqtree_standard_newick/{fasta_name}.best.treefile',
+        bootstraps_file = \
+        'results/iqtree_standard_newick/{fasta_name}.boot.treefile',
 
     conda:
         'envs/iqtree_ultrafast.yaml'
@@ -631,7 +634,7 @@ rule visualize_iqtree_standard:
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/iqtree_standard_newick_decoded/{fasta_name}.treefile'
+        tree_newick = 'results/iqtree_standard_newick/{fasta_name}.best.treefile'
 
     output:
         tree_pdf = 'results/iqtree_standard_pdf/{fasta_name}.pdf'
