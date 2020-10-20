@@ -1,5 +1,7 @@
 name: phylobayes_mpi 
 channels:
+    - conda-forge
     - bioconda
 dependencies:
+    - openmpi=4.0.5 
     - phylobayes-mpi=1.8b
