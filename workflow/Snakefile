@@ -640,12 +640,15 @@ rule pb_chain_one:
         topology_file =\
         'results/phylobayes_output/{fasta_name}_chain_1.treelist'
 
+    conda:
+        'envs/phylobayes_mpi.yaml'
+
     shell:
         """
-        pb -d {input.phylip_file} \
-           -x 5 100 \
-           -catfix C20 \
-           $(echo {output.topology_file} | cut -f 1 -d '.')
+        pb_mpi -d {input.phylip_file} \
+               -x 5 100 \
+               -catfix C20 \
+               $(echo {output.topology_file} | cut -f 1 -d '.')
         """
 
 
@@ -671,12 +674,15 @@ rule pb_chain_two:
         topology_file =\
         'results/phylobayes_output/{fasta_name}_chain_2.treelist'
 
+    conda:
+        'envs/phylobayes_mpi.yaml'
+
     shell:
         """
-        pb -d {input.phylip_file} \
-           -x 1 200 \
-           -catfix C20 \
-           $(echo {output.topology_file} | cut -f 1 -d '.')
+        pb_mpi -d {input.phylip_file} \
+               -x 1 200 \
+               -catfix C20 \
+               $(echo {output.topology_file} | cut -f 1 -d '.')
         """
 
 
@@ -692,6 +698,9 @@ rule trace_pb_chains:
     output:
         consensus_tree =\
         'results/phylobayes_output/{fasta_name}_bpcomp_output.con.tre'
+
+    conda:
+        'envs/phylobayes_mpi.yaml'
 
     shell:
         """
