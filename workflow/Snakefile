@@ -593,9 +593,9 @@ rule iqtree_standard:
 
     output:
         newick_tree_file =\
-        'results/iqtree_standard_newick/{fasta_name}.best.treefile',
+        'results/iqtree_standard_newick/{fasta_name}.treefile',
         bootstraps_file = \
-        'results/iqtree_standard_newick/{fasta_name}.boot.treefile',
+        'results/iqtree_standard_newick/{fasta_name}.boottrees',
 
     conda:
         'envs/iqtree_ultrafast.yaml'
