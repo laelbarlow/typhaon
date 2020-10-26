@@ -111,7 +111,7 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
                      boot_newick,
                      '-pre', intermediate_topo_with_boots_file.rsplit('.', 1)[0]
                      ])
-    boot_newick_tree = intermediate_topo_with_boots_file
+    boot_newick_tree = Tree(intermediate_topo_with_boots_file)
     
 
     # Root trees on the same node arbitrarily.
