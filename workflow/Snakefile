@@ -81,8 +81,6 @@ rule final_results:
             fasta_name = fasta_names),
         expand('results/iqtree_standard_pdf/{fasta_name}.pdf', \
             fasta_name = fasta_names),
-        expand('results/phylobayes_newick_with_boots/{fasta_name}.tre', \
-            fasta_name = fasta_names),
         'results/workflow_diagram.pdf'
 
 
