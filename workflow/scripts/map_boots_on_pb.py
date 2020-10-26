@@ -72,8 +72,8 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
         if not found_boot:
             if len(n1.get_leaves()) == 1:
                 found_boot = True
-        assert found_boot, "Error: could not identify one of the nodes in the
-        bootstrap tree."
+        assert found_boot, """Error: could not identify one of the nodes in the
+        bootstrap tree."""
 
     # Write the newick tree file to a temporary output file.
     temp_file = combined_figtree_newick + '_temp.newick'
