@@ -26,8 +26,10 @@ def reformat_combined_supports(tree_string):
 
         # Replace the instance with a reformatted support string in the
         # tree_string.
-        tree_string = tree_string.replace(instance, instance[0] +\
-                supcomb2 + instance[-1])
+        #tree_string = tree_string.replace(instance, instance[0] +\
+        #        supcomb2 + instance[-1])
+        tree_string = tree_string.replace(instance, '\"' + instance[0] +\
+                supcomb2 + instance[-1] + '\"')
 
     # Return modified tree string.
     return tree_string

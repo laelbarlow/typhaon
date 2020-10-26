@@ -147,7 +147,11 @@ if __name__ == '__main__':
     ts.show_leaf_name = False
 
     # Parse tree.
-    t1 = Tree(tf)
+    t1 = None
+    try:
+        t1 = Tree(tf)
+    except:
+        t1 = Tree(tf, quoted_node_names=True)
     #print(t1)
 
     # Make a copy of the TreeNode object.
