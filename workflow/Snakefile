@@ -634,7 +634,7 @@ rule visualize_iqtree_standard:
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/iqtree_standard_newick/{fasta_name}.best.treefile'
+        tree_newick = 'results/iqtree_standard_newick/{fasta_name}.treefile'
 
     output:
         tree_pdf = 'results/iqtree_standard_pdf/{fasta_name}.pdf'
