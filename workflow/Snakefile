@@ -714,7 +714,7 @@ rule map_boots_on_pb:
     input:
         script = 'workflow/scripts/map_boots_on_pb.py',
         pb_newick =\
-        'results/phylobayes_newick_decoded/{fasta_name}_bpcomp_output.con.tre',
+        'results/phylobayes_output/{fasta_name}_bpcomp_output.con.tre',
         iqtree_bootstrap_newick =\
         'results/iqtree_standard_newick/{fasta_name}.boottrees'
 
