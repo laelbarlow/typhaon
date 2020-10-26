@@ -72,20 +72,6 @@ def check_leaf_names_match(t1, t2):
     terminal (leaf) node names do not perfectly overlap."""
 
 
-def map_boot_sup_on_topo(boot_newick, prob_newick, out_newick):
-    """
-    Take a newick file with bootstrap trees, and a newick file with one tree,
-    and use IQ-TREE to map the bootstrap values onto the topology of the single
-    newick tree. Return the path to the tree with bootstrap values.
-    """
-    # Run IQ-TREE.
-    subprocess.call(['iqtree',
-                     '-sup', prob_newick,
-                     boot_newick,
-                     '-pre', out_newick.rsplit('.', 1)[0]
-                     ])
-
-
 def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
     """Takes two newick files and writes another newick file that when opened
     in figtree will show posterior probabilities and bootstrap values together.
@@ -94,21 +80,23 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
     rooted on the same node, because that might affect the accuracy of
     comparisons.
     """
-    # Define function for adding zeros as necessary.
-    get_3_digit = lambda x: '0'*(3 - len(x)) + x
+    ## Define function for adding zeros as necessary.
+    #get_3_digit = lambda x: '0'*(3 - len(x)) + x
+
+    # Parse the input newick tree files.
+    boot_newick_tree = Tree(boot_newick)
+    prob_newick_tree = Tree(prob_newick)
+
+    # Check that the leaf node names match.
+    check_leaf_names_match(boot_newick_tree, prob_newick_tree)
 
     # Map bootstrap values onto the phylobayes topology using IQ-TREE.
-    out_newick = os.path.join(os.path.dirname(combined_figtree_newick),
-            os.path.basename(prob_newick).rsplit('.', 1)[0] +\
-            '_just_boot_sup.treefile')
-    boot_newick = map_boot_sup_on_topo(boot_newick, prob_newick, out_newick)
+    subprocess.call(['iqtree',
+                     '-sup', prob_newick,
+                     boot_newick,
+                     '-pre', combined_figtree_newick.rsplit('.', 1)[0]
+                     ])
     
-    ## Parse the input newick tree files.
-    #boot_newick_tree = Tree(boot_newick)
-    #prob_newick_tree = Tree(prob_newick)
-
-    ## Check that the leaf node names match.
-    #check_leaf_names_match(boot_newick_tree, prob_newick_tree)
 
     ## Root trees on the same node arbitrarily.
     #arbitrary_leaf_node = prob_newick_tree.get_leaves()[0]

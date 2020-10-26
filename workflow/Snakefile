@@ -720,7 +720,7 @@ rule map_boots_on_pb:
         'results/iqtree_standard_newick/{fasta_name}.boottrees'
 
     output:
-        newick = 'results/phylobayes_newick_with_boots/{fasta_name}.tre'
+        newick = 'results/phylobayes_newick_with_boots/{fasta_name}.suptree'
 
     conda:
         'envs/visualize_fasttree.yaml'
