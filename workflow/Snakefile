@@ -496,6 +496,34 @@ rule decode_iqtree_ultrafast_names:
                     {input.conversion_table_file} 
         """
 
+
+rule decode_iqtree_standard_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file = \
+        'results/iqtree_standard_newick/{fasta_name}.treefile',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        decoded_newick_file = 'results/iqtree_standard_newick_decoded/{fasta_name}.treefile'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
+                    {input.conversion_table_file} 
+        """
+
+
 rule decode_pb_names:
     """
     Decode names in newick tree files.
@@ -634,7 +662,7 @@ rule visualize_iqtree_standard:
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/iqtree_standard_newick/{fasta_name}.treefile'
+        tree_newick = 'results/iqtree_standard_newick_decoded/{fasta_name}.treefile'
 
     output:
         tree_pdf = 'results/iqtree_standard_pdf/{fasta_name}.pdf'
