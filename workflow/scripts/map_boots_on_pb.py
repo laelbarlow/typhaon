@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     # Map bootstrap values onto pb topology.
     combine_supports(iqtree_bootstrap_newick,
-                     prob_newick,
+                     pb_newick,
                      output_newick)
 
 
