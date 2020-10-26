@@ -79,6 +79,8 @@ rule final_results:
             fasta_name = fasta_names),
         expand('results/iqtree_standard_pdf/{fasta_name}.pdf', \
             fasta_name = fasta_names),
+        expand('results/phylobayes_newick_with_boots/{fasta_name}.tre', \
+            fasta_name = fasta_names),
         'results/workflow_diagram.pdf'
 
 
@@ -129,6 +131,14 @@ rule standard_iqtree:
         expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
             fasta_name = fasta_names),
         'results/workflow_diagram.pdf'
+
+
+#rule restart_pb:
+#    """
+#    Restart pb chain 1 and 2. This is necessary if they have not yet converged.
+#    """
+#    input:
+#        ??????
 
 
 #rule clean_unexpected_chars:
@@ -694,6 +704,43 @@ rule visualize_pb:
         """
         python3 {input.script} {input.tree_newick} {output.tree_pdf}
         """
+
+
+rule map_boots_on_pb:
+    """
+    Map bootstrap support values from standard IQ-TREE bootstrap analysis to
+    Phylobayes topology.
+    """
+    input:
+        script = 'workflow/scripts/map_boots_on_pb.py',
+        pb_newick =\
+        'results/phylobayes_newick_decoded/{fasta_name}_bpcomp_output.con.tre',
+        iqtree_bootstrap_newick =\
+        'results/iqtree_standard_newick/{fasta_name}.boottrees'
+
+    output:
+        newick = 'results/phylobayes_newick_with_boots/{fasta_name}.tre'
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.pb_newick} \
+                    {input.iqtree_bootstrap_newick} \
+                    {output.newick}
+        """
+
+
+#rule visualize_boots_on_pb:
+#    """
+#    """
+#    input:
+#        script = 'workflow/scripts/visualize_boots_on_pb.py',
+#        newick = 'results/phylobayes_newick_with_boots/{fasta_name}.tre'
+#    ...
+
 
 
 #rule iqtree_nonparam:
