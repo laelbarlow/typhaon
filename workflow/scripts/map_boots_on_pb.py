@@ -62,6 +62,8 @@ def check_leaf_names_match(t1, t2):
         %s""" % ',\n'.join(in_2_not_1))
 
     # Assert that both trees have the same number of leaf nodes.
+    print(len(t1_names))
+    print(len(t2_names))
     assert len(t1_names) == len(t2_names), """Different numbers of terminal
     (leaf) nodes in input trees."""
 
