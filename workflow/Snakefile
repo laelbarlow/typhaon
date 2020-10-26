@@ -739,7 +739,8 @@ rule visualize_boots_on_pb:
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/phylobayes_newick_with_boots/{fasta_name}.tre'
+        tree_newick =\
+        'results/phylobayes_newick_with_boots/{fasta_name}.suptree'
 
     output:
         tree_pdf = 'results/phylobayes_pdf_with_boots/{fasta_name}.pdf'
