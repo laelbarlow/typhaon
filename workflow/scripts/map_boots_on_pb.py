@@ -82,8 +82,8 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
     rooted on the same node, because that might affect the accuracy of
     comparisons.
     """
-    ## Define function for adding zeros as necessary.
-    #get_3_digit = lambda x: '0'*(3 - len(x)) + x
+    # Define function for adding zeros as necessary.
+    get_3_digit = lambda x: '0'*(3 - len(x)) + x
 
     # Parse the input newick tree files.
     boot_newick_tree = Tree(boot_newick)
@@ -129,9 +129,9 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
                     found_boot = True
 
                     mb_support = str(n1.support)[:-2]
-                    raxml_support = get_3_digit(str(n2.support)[:-2])
+                    iqtree_support = get_3_digit(str(n2.support)[:-2])
 
-                    combined_support = mb_support + raxml_support
+                    combined_support = mb_support + iqtree_support 
                     n1.support = int(combined_support)
 
         # Make sure that all the right nodes were identified.
