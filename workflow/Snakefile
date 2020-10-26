@@ -75,6 +75,8 @@ rule final_results:
             fasta_name = fasta_names),
         expand('results/phylobayes_pdf/{fasta_name}.pdf', \
             fasta_name = fasta_names),
+        expand('results/phylobayes_pdf_with_boots/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
         expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
             fasta_name = fasta_names),
         expand('results/iqtree_standard_pdf/{fasta_name}.pdf', \
@@ -85,7 +87,6 @@ rule final_results:
 
 
         
-
 
 rule help:
     """
@@ -733,13 +734,23 @@ rule map_boots_on_pb:
         """
 
 
-#rule visualize_boots_on_pb:
-#    """
-#    """
-#    input:
-#        script = 'workflow/scripts/visualize_boots_on_pb.py',
-#        newick = 'results/phylobayes_newick_with_boots/{fasta_name}.tre'
-#    ...
+rule visualize_boots_on_pb:
+    """
+    """
+    input:
+        script = 'workflow/scripts/visualize_fasttree.py',
+        tree_newick = 'results/phylobayes_newick_with_boots/{fasta_name}.tre'
+
+    output:
+        tree_pdf = 'results/phylobayes_pdf_with_boots/{fasta_name}.pdf'
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        python3 {input.script} {input.tree_newick} {output.tree_pdf}
+        """
 
 
 
