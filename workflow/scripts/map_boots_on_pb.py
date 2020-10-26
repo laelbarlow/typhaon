@@ -72,6 +72,20 @@ def check_leaf_names_match(t1, t2):
     terminal (leaf) node names do not perfectly overlap."""
 
 
+def map_boot_sup_on_topo(boot_newick, prob_newick, out_newick):
+    """
+    Take a newick file with bootstrap trees, and a newick file with one tree,
+    and use IQ-TREE to map the bootstrap values onto the topology of the single
+    newick tree. Return the path to the tree with bootstrap values.
+    """
+    # Run IQ-TREE.
+    subprocess.call(['iqtree',
+                     '-sup', prob_newick,
+                     boot_newick,
+                     '-pre', out_newick.rsplit('.', 1)[0]
+                     ])
+
+
 def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
     """Takes two newick files and writes another newick file that when opened
     in figtree will show posterior probabilities and bootstrap values together.
@@ -82,56 +96,62 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
     """
     # Define function for adding zeros as necessary.
     get_3_digit = lambda x: '0'*(3 - len(x)) + x
+
+    # Map bootstrap values onto the phylobayes topology using IQ-TREE.
+    out_newick = os.path.join(os.path.dirname(combined_figtree_newick),
+            os.path.basename(prob_newick).rsplit('.', 1)[0] +\
+            '_just_boot_sup.treefile'
+    boot_newick = map_boot_sup_on_topo(boot_newick, prob_newick, outdir)
     
-    # Parse the input newick tree files.
-    boot_newick_tree = Tree(boot_newick)
-    prob_newick_tree = Tree(prob_newick)
+    ## Parse the input newick tree files.
+    #boot_newick_tree = Tree(boot_newick)
+    #prob_newick_tree = Tree(prob_newick)
 
-    # Check that the leaf node names match.
-    check_leaf_names_match(boot_newick_tree, prob_newick_tree)
+    ## Check that the leaf node names match.
+    #check_leaf_names_match(boot_newick_tree, prob_newick_tree)
 
-    # Root trees on the same node arbitrarily.
-    arbitrary_leaf_node = prob_newick_tree.get_leaves()[0]
-    prob_newick_tree.set_outgroup(arbitrary_leaf_node.name)
-    boot_newick_tree.set_outgroup(arbitrary_leaf_node.name)
+    ## Root trees on the same node arbitrarily.
+    #arbitrary_leaf_node = prob_newick_tree.get_leaves()[0]
+    #prob_newick_tree.set_outgroup(arbitrary_leaf_node.name)
+    #boot_newick_tree.set_outgroup(arbitrary_leaf_node.name)
 
-    # Iterate through the rooted trees matching nodes and combining the support
-    # values onto a single tree.
-    for n1 in prob_newick_tree.traverse():
-        found_boot = False
-        if len(n1.get_leaf_names()) > 1:
-            for n2 in boot_newick_tree.traverse():
-                if set(n1.get_leaf_names()) == set(n2.get_leaf_names()):
-                    found_boot = True
+    ## Iterate through the rooted trees matching nodes and combining the support
+    ## values onto a single tree.
+    #for n1 in prob_newick_tree.traverse():
+    #    found_boot = False
+    #    if len(n1.get_leaf_names()) > 1:
+    #        for n2 in boot_newick_tree.traverse():
+    #            if set(n1.get_leaf_names()) == set(n2.get_leaf_names()):
+    #                found_boot = True
 
-                    mb_support = str(n1.support)[:-2]
-                    raxml_support = get_3_digit(str(n2.support)[:-2])
+    #                mb_support = str(n1.support)[:-2]
+    #                raxml_support = get_3_digit(str(n2.support)[:-2])
 
-                    combined_support = mb_support + raxml_support
-                    n1.support = int(combined_support)
+    #                combined_support = mb_support + raxml_support
+    #                n1.support = int(combined_support)
 
-        # Make sure that all the right nodes were identified.
-        if not found_boot:
-            if len(n1.get_leaves()) == 1:
-                found_boot = True
-        assert found_boot, """Error: could not identify one of the nodes in the
-        bootstrap tree."""
+    #    # Make sure that all the right nodes were identified.
+    #    if not found_boot:
+    #        if len(n1.get_leaves()) == 1:
+    #            found_boot = True
+    #    assert found_boot, """Error: could not identify one of the nodes in the
+    #    bootstrap tree."""
 
-    # Write the newick tree file to a temporary output file.
-    temp_file = combined_figtree_newick + '_temp.newick'
-    prob_newick_tree.write(outfile=temp_file)
+    ## Write the newick tree file to a temporary output file.
+    #temp_file = combined_figtree_newick + '_temp.newick'
+    #prob_newick_tree.write(outfile=temp_file)
 
-    # Reformat supports in temporary file with tree so that they will be
-    # displayed properly in FigTree.
-    with open(temp_file) as infh, open(combined_figtree_newick, 'w') as o:
-        for i in infh:
-            # Call function to reformat tree string.
-            new_tree_string = reformat_combined_supports(i)
-            # Write reformatted tree string.
-            o.write(new_tree_string)
+    ## Reformat supports in temporary file with tree so that they will be
+    ## displayed properly in FigTree.
+    #with open(temp_file) as infh, open(combined_figtree_newick, 'w') as o:
+    #    for i in infh:
+    #        # Call function to reformat tree string.
+    #        new_tree_string = reformat_combined_supports(i)
+    #        # Write reformatted tree string.
+    #        o.write(new_tree_string)
 
-    # Remove temporary file.
-    os.remove(temp_file)
+    ## Remove temporary file.
+    #os.remove(temp_file)
 
 
 

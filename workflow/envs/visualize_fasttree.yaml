@@ -11,4 +11,5 @@ dependencies:
     - reportlab
     - matplotlib
     - PyPDF2
+    - iqtree=2.0.3
 
