@@ -101,7 +101,7 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
     out_newick = os.path.join(os.path.dirname(combined_figtree_newick),
             os.path.basename(prob_newick).rsplit('.', 1)[0] +\
             '_just_boot_sup.treefile')
-    boot_newick = map_boot_sup_on_topo(boot_newick, prob_newick, outdir)
+    boot_newick = map_boot_sup_on_topo(boot_newick, prob_newick, out_newick)
     
     ## Parse the input newick tree files.
     #boot_newick_tree = Tree(boot_newick)
