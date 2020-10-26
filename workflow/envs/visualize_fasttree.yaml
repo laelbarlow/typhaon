@@ -3,6 +3,7 @@ channels:
     - etetoolkit
     - anaconda
     - conda-forge
+    - bioconda
 dependencies:
     - python=3.8
     - xvfbwrapper=0.2.9
