@@ -21,6 +21,8 @@ def reformat_combined_supports(tree_string):
         # Define a reformatted support string.
         supcomb = instance[1:-1]
         boot = supcomb[-3:].lstrip('0')
+        if boot != '0':
+            boot = boot.lstrip('0')
         prob = str(int(supcomb[:-3])/100)
         supcomb2 = prob + '/' + boot
 
