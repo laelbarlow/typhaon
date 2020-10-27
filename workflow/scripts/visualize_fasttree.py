@@ -17,7 +17,7 @@ from string import Template
 import numpy as np
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from ete3 import Tree, NodeStyle, TreeStyle, TextFace
+from ete3 import Tree, AttrFace, NodeStyle, TreeStyle, TextFace
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 from PyPDF2 import PdfFileWriter, PdfFileReader
@@ -35,7 +35,8 @@ def customize_node_styles_for_visualization(t):
     # Add a face to internal nodes with branch support string.
     for node in t.traverse():
         if not node.is_leaf():
-            node.add_face(TextFace(node.support, fsize=5), column=0, position='branch-top')
+            #node.add_face(TextFace(node.support, fsize=5), column=0, position='branch-top')
+            node.add_face(TextFace(node.name, fsize=5), column=0, position='branch-top')
 
 
     # Remove blue dots before leaf names.
