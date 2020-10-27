@@ -28,8 +28,8 @@ def reformat_combined_supports(tree_string):
         # tree_string.
         #tree_string = tree_string.replace(instance, instance[0] +\
         #        supcomb2 + instance[-1])
-        tree_string = tree_string.replace(instance, '\"' + instance[0] +\
-                supcomb2 + instance[-1] + '\"')
+        tree_string = tree_string.replace(instance, instance[0] + '\"' + \
+                supcomb2 + '\"' + instance[-1])
 
     # Return modified tree string.
     return tree_string
