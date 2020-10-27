@@ -360,7 +360,7 @@ rule fasttree:
 
     shell:
         """
-        fasttree -out {output.newick_tree_file} {input.trimmed_fasta_file} -lg
+        fasttree -lg -out {output.newick_tree_file} {input.trimmed_fasta_file}
         """
 
 

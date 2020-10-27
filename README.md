@@ -28,12 +28,10 @@ including summary of topology and branch supports in a figure.
 
 ## Software requirements
 
-- Linux or MacOS operating system. 
-- Python3 and the Conda package manager (see
-  [Anaconda](https://www.anaconda.com/products/individual) if you don't already
-  have this on your personal computer).
-- Pre-installed software (not installed via Conda):
-    - Phylobayes.
+- Linux Sun Grid Engine (SGE) computing cluster. This has not been tested on
+  other cluster types. Only partial functionality is available if installed on
+  a Linux of MacOS personal computer. 
+- Python3 and the Conda package manager.
 
 
 ## Overview of programmed workflow steps
@@ -56,35 +54,41 @@ including summary of topology and branch supports in a figure.
   cd typhaon
   ```
 
-- Check that the Conda package manager is installed:
+- Install typhaon (set up snakemake environment and profile for submitting jobs
+  via your cluster's job scheduler), and run a test job.
   ```
-  conda --version
+  make install
+  make dry_run
   ```
-
-- To use the [Snakemake workflow
-  manager](https://snakemake.readthedocs.io/en/stable/), activate a Conda
-  environment with snakemake installed (see [Snakemake
-  documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
-  for procedure).
 
 - Run a very quick phylogenetic analysis to identify any obvious issues before
   proceeding with more time-intensive methods.
-
   ```
-  snakemake super_quick_tree --cores 1  ...
-  ```
-
-- Observe the resulting sequence alignment(s) and tree topology...
-
-- Run a quick phylogenetic analysis to identify any obvious issues before
-  proceeding with more time-intensive methods.
-  ```
-  snakemake quick_tree --cores 1  ...
+  make run_fasttree
   ```
 
-- Run a full phylogenetic analysis.
+- Observe the resulting sequence alignment(s) and tree topology in the results
+  directory.
+
+- Run IQ-TREE with ultrafast bootstrapping.
   ```
-  snakemake  --cores 1  ...
+  make run_ultrafast_iqtree
+  ```
+
+- Run IQ-TREE with standard non-parametric bootstrapping.
+  ```
+  make run_standard_iqtree
+  ```
+
+- Run full analysis including Phylobayes, and map support values from IQ-TREE
+  standard bootstrapping onto Phylobayes topology.
+  ```
+  make run
+  ```
+
+- Archive a completed analysis for later reproduction.
+  ```
+  make archive
   ```
 
 
