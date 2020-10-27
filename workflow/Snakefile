@@ -307,7 +307,7 @@ rule modelfinder:
     estimates.Nat. Methods, 14:587–589. DOI:10.1038/nmeth.4285
     """
     input:
-        trimmed_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
 
     output:
         model_file = 'results/modelfinder_output/{fasta_name}.iqtree'
