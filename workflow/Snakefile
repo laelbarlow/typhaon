@@ -764,7 +764,7 @@ rule pb_chain_one:
 
     shell:
         """
-        mpirun -n 2 pb_mpi -d {input.phylip_file} \
+        mpirun -n 8 pb_mpi -d {input.phylip_file} \
                            -x 1 10000 \
                            -catfix C20 -gtr \
                            $(echo {output.topology_file} | cut -f 1 -d '.')
@@ -798,7 +798,7 @@ rule pb_chain_two:
 
     shell:
         """
-        mpirun -n 2 pb_mpi -d {input.phylip_file} \
+        mpirun -n 8 pb_mpi -d {input.phylip_file} \
                            -x 1 10000 \
                            -catfix C20 -gtr \
                            $(echo {output.topology_file} | cut -f 1 -d '.')
