@@ -129,6 +129,9 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
                     found_boot = True
 
                     mb_support = str(n1.support)[:-2]
+                    print(n1.support)
+                    print(mb_support)
+
                     iqtree_support = get_3_digit(str(n2.support)[:-2])
 
                     combined_support = mb_support + iqtree_support 
