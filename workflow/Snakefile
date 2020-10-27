@@ -570,7 +570,7 @@ rule decode_pb_with_boot_names:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file =\
-        'results/phylobayes_newick_with_boots/{fasta_name}.suptree'
+        'results/phylobayes_newick_with_boots/{fasta_name}.suptree',
         conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
 
     output:
