@@ -88,8 +88,13 @@ resources
 - To customize parameters for any of the various software packages used in this
   workflow, modify the `workflow/Snakefile` file.
 
-- Run a very quick phylogenetic analysis to identify any obvious issues before
-  proceeding with more time-intensive methods.
+- Remove redundant sequences with
+  [CD-HIT](http://www.bioinformatics.org/cd-hit/cd-hit-user-guide.pdf), align
+  sequences with [MUSCLE](http://www.drive5.com/muscle/muscle.html), trim
+  alignment with [TrimAl](http://trimal.cgenomics.org/), and run a very quick
+  phylogenetic analysis with [FastTree](http://microbesonline.org/fasttree/) to
+  identify any obvious issues before proceeding with more time-intensive
+  methods.
   ```
   make run_fasttree
   ```
@@ -97,21 +102,28 @@ resources
 - Observe the resulting sequence alignment(s) and tree topology in the results
   directory.
 
-- Run IQ-TREE with ultrafast bootstrapping.
+- Run [IQ-TREE](http://www.iqtree.org/doc/) with ultrafast bootstrapping.
   ```
   make run_ultrafast_iqtree
   ```
 
-- Run IQ-TREE with standard non-parametric bootstrapping.
+- Run [IQ-TREE](http://www.iqtree.org/doc/) with standard non-parametric bootstrapping.
   ```
   make run_standard_iqtree
   ```
 
-- Run full analysis including Phylobayes, and map support values from IQ-TREE
-  standard bootstrapping onto Phylobayes topology.
+- Run full analysis including [Phylobayes MPI
+  manual](https://github.com/bayesiancook/pbmpi), and map support values from
+  [IQ-TREE](http://www.iqtree.org/doc/) standard bootstrapping onto [Phylobayes MPI
+  manual](https://github.com/bayesiancook/pbmpi)
+  topology.
   ```
   make run
   ```
+
+- After running a full analysis including Phylobayes, check that phylobayes
+  chains 1 and 2 reached convergence (refer to the [Phylobayes MPI
+  manual](https://github.com/bayesiancook/pbmpi)).
 
 - Archive a completed analysis for later reproduction.
   ```
