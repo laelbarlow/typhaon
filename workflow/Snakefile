@@ -1,25 +1,6 @@
 """
 SnakeMake workflow definition file.
 
-To-Do:
-
-    Write a rule to apply a method similar to TreeTrimmer for after IQ-TREE
-    ultrafast bootstrapping, but before nonparametric bootstrapping and
-    PhyloBayes.
-        Maruyama, S., Eveleigh, R.J., Archibald, J.M., 2013. Treetrimmer: a
-        method for phylogenetic dataset size reduction. BMC Res Notes 6, 145.
-        https://doi.org/10.1186/1756-0500-6-145
-
-    Write a rule to apply the HmmCleaner method to trim alignment:
-        Di Franco, A., Poujol, R., Baurain, D., Philippe, H., 2019. Evaluating
-        the usefulness of alignment filtering methods to reduce the impact of
-        errors on evolutionary inferences. BMC Evol Biol 19, 21.
-        https://doi.org/10.1186/s12862-019-1350-2
-
-    Add Gblocks as another alternative method for trimming alignments?
-
-
-
 """
 import os
 import shutil
@@ -43,34 +24,10 @@ rule final_results:
     Get output files from full analysis.
     """
     input:
-        #expand('results/concat_fasta/{fasta_name}.faa', \
-        #    fasta_name = fasta_names),
-        #expand('results/nonredun_fasta/{fasta_name}.faa', \
-        #    fasta_name = fasta_names),
-        #expand('results/aligned_fasta/{fasta_name}.afaa', \
-        #    fasta_name = fasta_names),
-        #expand('results/trimmed_fasta/{fasta_name}.afaa', \
-        #    fasta_name = fasta_names),
-        #expand('results/fasttree_newick/{fasta_name}.tre', \
-        #    fasta_name = fasta_names),
-        #expand('results/modelfinder_output/{fasta_name}.iqtree', \
-        #    fasta_name = fasta_names),
         expand('results/fasttree_pdf/{fasta_name}.pdf', \
             fasta_name = fasta_names),
-        #expand('results/modelfinder_output/{fasta_name}.txt', \
-        #    fasta_name = fasta_names),
-        #expand('results/iqtree_ultrafast_newick/{fasta_name}.treefile', \
-        #    fasta_name = fasta_names),
         expand('results/iqtree_ultrafast_pdf/{fasta_name}.pdf', \
             fasta_name = fasta_names),
-        #expand('results/trimmed_fasta_coded/{fasta_name}.afaa', \
-        #    fasta_name = fasta_names),
-        #expand('results/trimmed_phylip_coded/{fasta_name}.phy', \
-        #    fasta_name = fasta_names),
-        #expand('results/phylobayes_output/{fasta_name}_chain_1.treelist', \
-        #    fasta_name = fasta_names),
-        #expand('results/phylobayes_output/{fasta_name}_chain_2.treelist', \
-        #    fasta_name = fasta_names),
         expand('results/phylobayes_output/{fasta_name}_bpcomp_output.con.tre', \
             fasta_name = fasta_names),
         expand('results/phylobayes_pdf/{fasta_name}.pdf', \
@@ -155,7 +112,7 @@ rule standard_iqtree:
 
 rule cdhit_subsets:
     """
-    ***Need to customize parameters! 
+    Reduce redundancy of sequences in each input file.
     """
     input:
         files = input_fasta_files,
@@ -403,7 +360,7 @@ rule fasttree:
 
     shell:
         """
-        fasttree -out {output.newick_tree_file} {input.trimmed_fasta_file}
+        fasttree -out {output.newick_tree_file} {input.trimmed_fasta_file} -lg
         """
 
 
@@ -778,20 +735,6 @@ rule visualize_boots_on_pb:
         """
         python3 {input.script} {input.tree_newick} {output.tree_pdf}
         """
-
-
-
-#rule iqtree_nonparam:
-#    """
-#    """
-#    input:
-#
-#    output:
-#
-#    shell:
-#        """
-#        """
-#
 
 
 rule pb_chain_one:
