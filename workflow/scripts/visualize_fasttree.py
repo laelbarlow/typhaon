@@ -151,7 +151,7 @@ if __name__ == '__main__':
     try:
         t1 = Tree(tf)
     except:
-        t1 = Tree(tf, quoted_node_names=True, format=2)
+        t1 = Tree(tf, format=1)
     #print(t1)
 
     # Make a copy of the TreeNode object.
