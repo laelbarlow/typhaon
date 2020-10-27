@@ -561,6 +561,34 @@ rule decode_pb_names:
         """
 
 
+rule decode_pb_with_boot_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file =\
+        'results/phylobayes_newick_with_boots/{fasta_name}.suptree'
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        decoded_newick_file =\
+        'results/phylobayes_newick_with_boots_decoded/{fasta_name}.suptree'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
+                    {input.conversion_table_file} 
+        """
+
+
 rule decode_fasttree_names:
     """
     Decode names in newick tree files.
@@ -738,7 +766,7 @@ rule visualize_boots_on_pb:
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
         tree_newick =\
-        'results/phylobayes_newick_with_boots/{fasta_name}.suptree'
+        'results/phylobayes_newick_with_boots_decoded/{fasta_name}.suptree'
 
     output:
         tree_pdf = 'results/phylobayes_pdf_with_boots/{fasta_name}.pdf'
