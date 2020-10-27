@@ -191,7 +191,7 @@ if __name__ == '__main__':
     vdisplay = Xvfb()
     vdisplay.start()
     try:
-        t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
+        t2.render(output_file_path, format=1, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
     finally:
         vdisplay.stop()
 
