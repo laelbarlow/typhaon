@@ -4,11 +4,11 @@
 
 ## Objectives
 
-As a starting point for further investigation, obtain phylogenetic analysis
-results for one or more sets of predicted peptide sequences for homologous
-genes (that is, genes that all encode at least one shared homologous domain),
-and generate a phylogram with a combination of branch support values in PDF
-format for each set of homologous sequences.
+As a starting point for further investigation, perform phylogenetic analysis of
+one or more sets of predicted peptide sequences for homologous genes (that is,
+genes that all encode at least one shared homologous protein domain) using both
+Maximum Likelihood (ML) and Bayesian Inference (BI) methods, and generate a
+phylograms in PDF format with a combination of branch ML and BI support values.
 
 
 ## Rationale
@@ -91,7 +91,12 @@ resources
 
 - To customize parameters for any of the various software packages used in this
   workflow, modify the `workflow/Snakefile` file. This is important, as default
-  parameters are unlikely to be appropriate for your particular analysis.
+  parameters are unlikely to be appropriate for your particular analysis. Pay
+  particular attention to rules that use
+  [CD-HIT](http://www.bioinformatics.org/cd-hit/cd-hit-user-guide.pdf) and
+  random sampling to exclude sequences from the final alignment for
+  phylogenetic analysis, as this is critical for obtaining a representative yet
+  computationally manageable set of sequences.
 
 - Remove redundant sequences with
   [CD-HIT](http://www.bioinformatics.org/cd-hit/cd-hit-user-guide.pdf), align
