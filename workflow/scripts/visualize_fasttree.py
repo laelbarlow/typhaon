@@ -147,11 +147,7 @@ if __name__ == '__main__':
     ts.show_leaf_name = False
 
     # Parse tree.
-    t1 = None
-    try:
-        t1 = Tree(tf)
-    except:
-        t1 = Tree(tf, format=1)
+    t1 = Tree(tf, format=1)
     #print(t1)
 
     # Make a copy of the TreeNode object.
@@ -191,7 +187,7 @@ if __name__ == '__main__':
     vdisplay = Xvfb()
     vdisplay.start()
     try:
-        t2.render(output_file_path, format=1, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
+        t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
     finally:
         vdisplay.stop()
 
