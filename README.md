@@ -90,7 +90,8 @@ resources
 ```
 
 - To customize parameters for any of the various software packages used in this
-  workflow, modify the `workflow/Snakefile` file.
+  workflow, modify the `workflow/Snakefile` file. This is important, as default
+  parameters are unlikely to be appropriate for your particular analysis.
 
 - Remove redundant sequences with
   [CD-HIT](http://www.bioinformatics.org/cd-hit/cd-hit-user-guide.pdf), align
