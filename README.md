@@ -7,18 +7,21 @@
 As a starting point for further investigation, obtain phylogenetic analysis
 results for one or more sets of predicted peptide sequences for homologous
 genes (that is, genes that all encode at least one shared homologous domain),
-including summary of topology and branch supports in a figure.
+and generate a phylogram with a combination of branch support values in PDF
+format for each set of homologous sequences.
 
 
 ## Rationale
 
 Phylogenetic analysis of single-gene families involves numerous steps (see
-workflow diagram below). In the absence of major sequence alignment errors,
-most if not all standard phylogetic analysis steps for a typical protein-coding
-gene family are quite routine and can therefore be programmed.  Also,
-performing phylogenetic analysis programmatically, especially using the
-[Snakemake workflow manager](https://snakemake.readthedocs.io/en/stable/),
-helps make analyses reproducible.
+workflow diagram below), implying that numerous commands must be entered or
+jobs submitted to a cluster (or webservice) for each set of sequences analyzed.
+In the absence of major sequence alignment errors, most if not all standard
+phylogetic analysis steps for a typical protein-coding gene family are quite
+routine and can therefore be programmed. Also, performing phylogenetic analysis
+programmatically, especially using the [Snakemake workflow
+manager](https://snakemake.readthedocs.io/en/stable/), helps make analyses
+reproducible.
 
 
 ## Assumptions regarding input sequences
@@ -32,7 +35,8 @@ helps make analyses reproducible.
 - Linux Sun Grid Engine (SGE) computing cluster. This has not been tested on
   other cluster types. Only partial functionality is available if installed on
   a Linux of MacOS personal computer. 
-- Python3 and the Conda package manager (Conda is not available on all
+- Python3 and the [Conda package and environment
+  manager](https://docs.conda.io/en/latest/) (Conda is not available on all
   clusters).
 
 
@@ -112,11 +116,10 @@ resources
   make run_standard_iqtree
   ```
 
-- Run full analysis including [Phylobayes MPI
-  manual](https://github.com/bayesiancook/pbmpi), and map support values from
-  [IQ-TREE](http://www.iqtree.org/doc/) standard bootstrapping onto [Phylobayes MPI
-  manual](https://github.com/bayesiancook/pbmpi)
-  topology.
+- Run full analysis including
+  [Phylobayes](https://github.com/bayesiancook/pbmpi), and map support values
+  from [IQ-TREE](http://www.iqtree.org/doc/) standard bootstrapping onto
+  [Phylobayes](https://github.com/bayesiancook/pbmpi) topology.
   ```
   make run
   ```
