@@ -71,7 +71,8 @@ helps make analyses reproducible.
   directory might look like. Sequences from files within each directory will be
   combined and aligned for analysis, but sequences from different directories
   will not be combined.
-```resources
+```
+resources
 ├── Protein_A_FASTA
 │   ├── Protein_A1_homologues.faa
 │   ├── Protein_A2_homologues.faa
