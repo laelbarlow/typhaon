@@ -74,10 +74,10 @@ helps make analyses reproducible.
   ```
   resources
   ├── Protein_A_FASTA
-  |   ├── Protein_A1_homologues.faa
-  |   ├── Protein_A2_homologues.faa
-  |   ├── Protein_A3_homologues.faa
-  |   └── Protein_A4_homologues.faa
+  │   ├── Protein_A1_homologues.faa
+  │   ├── Protein_A2_homologues.faa
+  │   ├── Protein_A3_homologues.faa
+  │   └── Protein_A4_homologues.faa
   └── Protein_B_FASTA
       ├── Protein_B1_homologues.faa
       ├── Protein_B2_homologues.faa
