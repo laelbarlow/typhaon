@@ -71,19 +71,18 @@ helps make analyses reproducible.
   directory might look like. Sequences from files within each directory will be
   combined and aligned for analysis, but sequences from different directories
   will not be combined.
-  ```
-  resources
-  ├── Protein_A_FASTA
- \│   ├── Protein_A1_homologues.faa
- \│   ├── Protein_A2_homologues.faa
- \│   ├── Protein_A3_homologues.faa
- \│   └── Protein_A4_homologues.faa
-  └── Protein_B_FASTA
-      ├── Protein_B1_homologues.faa
-      ├── Protein_B2_homologues.faa
-      ├── Protein_B3_homologues.faa
-      └── Protein_B4_homologues.faa
-  ```
+```resources
+├── Protein_A_FASTA
+│   ├── Protein_A1_homologues.faa
+│   ├── Protein_A2_homologues.faa
+│   ├── Protein_A3_homologues.faa
+│   └── Protein_A4_homologues.faa
+└── Protein_B_FASTA
+    ├── Protein_B1_homologues.faa
+    ├── Protein_B2_homologues.faa
+    ├── Protein_B3_homologues.faa
+    └── Protein_B4_homologues.faa
+```
 
 - To customize parameters for any of the various software packages used in this
   workflow, modify the `workflow/Snakefile` file.
