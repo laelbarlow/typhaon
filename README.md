@@ -12,16 +12,17 @@ including summary of topology and branch supports in a figure.
 
 ## Rationale
 
-- In the absence of major sequence alignment errors, all standard phylogetic
-  analysis steps for a typical protein-coding gene family are quite predictable
-  and can therefore be automated.
-- Performing phylogenetic analysis programmatically, especially using the
-  Snakemake workflow manager, helps make analyses reproducible.
+Phylogenetic analysis of single-gene families involves numerous steps (see
+workflow diagram below). In the absence of major sequence alignment errors,
+most if not all standard phylogetic analysis steps for a typical protein-coding
+gene family are quite routine and can therefore be programmed.  Also,
+performing phylogenetic analysis programmatically, especially using the
+[Snakemake workflow manager](https://snakemake.readthedocs.io/en/stable/),
+helps make analyses reproducible.
 
 
 ## Assumptions regarding input sequences
 
-- All input sequence file names end with the extension '.faa'.
 - All sequences within sets input for alignment share homology, at least in
   some significant subsequence. 
 
@@ -31,7 +32,8 @@ including summary of topology and branch supports in a figure.
 - Linux Sun Grid Engine (SGE) computing cluster. This has not been tested on
   other cluster types. Only partial functionality is available if installed on
   a Linux of MacOS personal computer. 
-- Python3 and the Conda package manager.
+- Python3 and the Conda package manager (Conda is not available on all
+  clusters).
 
 
 ## Overview of programmed workflow steps
@@ -60,6 +62,31 @@ including summary of topology and branch supports in a figure.
   make install
   make dry_run
   ```
+
+- Prepare input files in the 'resources' directory. All input sequence files
+  must be in FASTA format and file name must end with the extension '.faa'.
+  Sets of one or more FASTA files must be assembled into directories with names
+  ending with '_FASTA'. Directory and file names must not contain space
+  characters. For example, below is what input directories in the resources
+  directory might look like. Sequences from files within each directory will be
+  combined and aligned for analysis, but sequences from different directories
+  will not be combined.
+  ```
+  resources
+  ├── Protein_A_FASTA
+  |   ├── Protein_A1_homologues.faa
+  |   ├── Protein_A2_homologues.faa
+  |   ├── Protein_A3_homologues.faa
+  |   └── Protein_A4_homologues.faa
+  └── Protein_B_FASTA
+      ├── Protein_B1_homologues.faa
+      ├── Protein_B2_homologues.faa
+      ├── Protein_B3_homologues.faa
+      └── Protein_B4_homologues.faa
+  ```
+
+- To customize parameters for any of the various software packages used in this
+  workflow, modify the `workflow/Snakefile` file.
 
 - Run a very quick phylogenetic analysis to identify any obvious issues before
   proceeding with more time-intensive methods.
