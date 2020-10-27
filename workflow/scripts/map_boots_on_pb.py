@@ -128,7 +128,7 @@ def combine_supports(boot_newick, prob_newick, combined_figtree_newick):
                 if set(n1.get_leaf_names()) == set(n2.get_leaf_names()):
                     found_boot = True
 
-                    mb_support = get_3_digit(str(float(nq.support) * 100))
+                    mb_support = get_3_digit(str(float(n1.support) * 100))
 
                     iqtree_support = get_3_digit(str(n2.support)[:-2])
 
