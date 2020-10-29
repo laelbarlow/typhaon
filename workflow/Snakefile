@@ -703,6 +703,8 @@ rule map_boots_on_pb:
         'results/iqtree_standard_newick/{fasta_name}.boottrees'
 
     output:
+        just_boots_newick =\
+        'results/phylobayes_newick_with_boots/{fasta_name}_boots_only.suptree',
         newick = 'results/phylobayes_newick_with_boots/{fasta_name}.suptree'
 
     conda:
@@ -717,13 +719,43 @@ rule map_boots_on_pb:
         """
 
 
+rule decode_boots_on_pb:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file = \
+        'results/phylobayes_newick_with_boots/{fasta_name}_boots_only.suptree',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        decoded_newick_file = \
+        'results/phylobayes_newick_with_boots_only_decoded/{fasta_name}_boots_only.suptree',
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
+                    {input.conversion_table_file} 
+        """
+
+
 rule visualize_boots_on_pb:
     """
     """
     input:
-        script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick =\
-        'results/phylobayes_newick_with_boots_decoded/{fasta_name}.suptree'
+        script = 'workflow/scripts/visualize_boots_on_pb.py',
+        pb_newick =\
+        'results/phylobayes_newick_decoded/{fasta_name}_bpcomp_output.con.tre',
+        pb_newick_boots_only = \
+        'results/phylobayes_newick_with_boots_only_decoded/{fasta_name}_boots_only.suptree'
 
     output:
         tree_pdf = 'results/phylobayes_pdf_with_boots/{fasta_name}.pdf'
@@ -733,7 +765,7 @@ rule visualize_boots_on_pb:
 
     shell:
         """
-        python3 {input.script} {input.tree_newick} {output.tree_pdf}
+        python3 {input.script} {input.pb_newick} {input.pb_newick_boots_only} {output.tree_pdf}
         """
 
 
