@@ -28,19 +28,23 @@ from matplotlib.pyplot import imread
 import matplotlib.pyplot as plt
 from xvfbwrapper import Xvfb
 
-def customize_node_styles_for_visualization(t):
-    """Take an ete3 tree object , and modify the node styles for better
-    visualization.
+
+def add_support_to_nodes_as_faces(t):
+    """Take an ETE3 TreeNode object, and add node support values as TextFace on
+    top of the branch leading to the node.
     """
     # Add a face to internal nodes with branch support string.
     for node in t.traverse():
         if not node.is_leaf():
-            #node.add_face(TextFace(node.support, fsize=5), column=0, position='branch-top')
-            node.add_face(TextFace(node.name, fsize=5), column=0, position='branch-top')
+            node.add_face(TextFace(node.support, fsize=5), column=0, position='branch-top')
+            #node.add_face(TextFace(node.name, fsize=5), column=0, position='branch-top')
 
 
+def customize_node_styles_for_visualization(t):
+    """Take an ete3 tree object , and modify the node styles for better
+    visualization.
+    """
     # Remove blue dots before leaf names.
-    # Draws nodes as small red spheres of diameter equal to 10 pixels
     nstyle = NodeStyle()
     nstyle["shape"] = "sphere"
     nstyle["size"] = 0
@@ -148,7 +152,7 @@ if __name__ == '__main__':
     ts.show_leaf_name = False
 
     # Parse tree.
-    t1 = Tree(tf, format=3)
+    t1 = Tree(tf, format=0)
     #print(t1)
 
     # Make a copy of the TreeNode object.
@@ -157,50 +161,31 @@ if __name__ == '__main__':
     # Root on midpoint.
     t2.set_outgroup(t2.get_midpoint_outgroup())
 
+    # Add node support values as branch labels.
+    add_support_to_nodes_as_faces(t2)
+
     # Customize the node styles generally.
     customize_node_styles_for_visualization(t2)
 
-    ## Identify leaf node with original query sequence.
-    #nodes = []
-    #for n in t2.iter_leaves():
-    #    query_idx = query_id.rsplit('_', 1)[0]
-    #    if query_id in n.name:
-    #        nodes.append(n)
-    #    elif query_idx in n.name and len(query_idx) > 5:
-    #        nodes.append(n)
-    ##print(len(nodes))
-    #assert len(nodes) <= 1
-    #if len(nodes) == 1:
-    #    node = nodes[0]
-    #    # Highlight leaf for original query sequence.
-    #    highlight_node(t2, node)
-    #elif len(nodes) > 1:
-    #    print("""More than one instance of sequence with ID %s in tree for
-    #    results of searches with query with ID %s.""" % (query_id,
-    #        query_id))
-    #    assert not len(nodes) > 1
-    #else:
-    #    print("""Could not identify sequence with ID %s in tree for results
-    #    of searches with query with ID %s.""" % (query_id, query_id))
 
+    #####################################################
 
     # Write tree to pdf.
+
+    # Use this for running on personal computer:
+    t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
+    
+    ## Use this for running on a cluster:
+    #vdisplay = Xvfb()
+    #vdisplay.start()
     #try:
     #    t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
-    #except:
+    #finally:
+    #    vdisplay.stop()
 
-    vdisplay = Xvfb()
-    vdisplay.start()
-    try:
-        t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
-    finally:
-        vdisplay.stop()
+
+    #####################################################
 
     # Check that PDF was written.
     assert os.path.isfile(output_file_path)
-
-    ## Make a copy for markup.
-    #shutil.copyfile(output_file_path, output_file_path.rsplit('.', 1)[0] +\
-    #        '_with_markup.pdf')
-        
 
