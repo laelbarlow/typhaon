@@ -41,7 +41,8 @@ def add_combined_support_to_nodes_as_faces(t1, t2):
             node2 = get_corresponding_node(node1, t2)
 
             # Construct combined support value.
-            combined_support = str(node1.support) + '/' + str(node2.support)
+            combined_support = str(node1.support) + '/' + \
+                               str(int(node2.support))
 
             # Add combined support value as a branch label.
             node1.add_face(TextFace(combined_support, fsize=5), column=0, position='branch-top')
