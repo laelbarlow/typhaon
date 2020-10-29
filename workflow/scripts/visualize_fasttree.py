@@ -26,6 +26,7 @@ import colorsys
 import matplotlib
 from matplotlib.pyplot import imread
 import matplotlib.pyplot as plt
+from xvfbwrapper import Xvfb
 
 def customize_node_styles_for_visualization(t):
     """Take an ete3 tree object , and modify the node styles for better
