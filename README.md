@@ -118,7 +118,8 @@ resources
 - Run full analysis including
   [Phylobayes](https://github.com/bayesiancook/pbmpi), and map support values
   from [IQ-TREE](http://www.iqtree.org/doc/) standard bootstrapping onto
-  [Phylobayes](https://github.com/bayesiancook/pbmpi) topology. 
+  [Phylobayes](https://github.com/bayesiancook/pbmpi) topology. Output file(s)
+  will be written to the `results/phylobayes_pdf_with_boots` directory.
   ```
   make run
   ```
