@@ -159,7 +159,7 @@ rule randomly_sample_seqs:
         # (Second argument is seed for random sampling.)
 
         python3 {input.script} \
-                    80 \
+                    20 \
                     54321 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
