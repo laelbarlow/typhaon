@@ -2,13 +2,12 @@
 # Typhaon: A workflow for phylogentic analysis of protein families
 
 
-## Objectives
+## Objective
 
-As a starting point for further investigation, perform phylogenetic analysis of
-one or more sets of predicted peptide sequences for homologous genes (that is,
-genes that all encode at least one shared homologous protein domain) using both
-Maximum Likelihood (ML) and Bayesian Inference (BI) methods, and generate a
-phylograms in PDF format with a combination of branch ML and BI support values.
+Perform phylogenetic analysis of one or more sets of predicted peptide
+sequences for homologous genes using both Maximum Likelihood (ML) and Bayesian
+Inference (BI) methods, and generate a phylograms in PDF format with a
+combination of branch ML and BI support values.
 
 
 ## Rationale
@@ -22,12 +21,6 @@ routine and can therefore be programmed. Also, performing phylogenetic analysis
 programmatically, especially using the [Snakemake workflow
 manager](https://snakemake.readthedocs.io/en/stable/), helps make analyses
 reproducible.
-
-
-## Assumptions regarding input sequences
-
-- All sequences within sets input for alignment share homology, at least in
-  some significant subsequence. 
 
 
 ## Software requirements
@@ -50,7 +43,7 @@ reproducible.
 ## Procedure 
 
 - Clone the code repository from github to your computer by running the
-  following command in your terminal:
+  following shell command in your terminal:
   ```
   git clone https://github.com/laelbarlow/typhaon.git
   ```
@@ -125,7 +118,7 @@ resources
 - Run full analysis including
   [Phylobayes](https://github.com/bayesiancook/pbmpi), and map support values
   from [IQ-TREE](http://www.iqtree.org/doc/) standard bootstrapping onto
-  [Phylobayes](https://github.com/bayesiancook/pbmpi) topology.
+  [Phylobayes](https://github.com/bayesiancook/pbmpi) topology. 
   ```
   make run
   ```
