@@ -41,8 +41,6 @@ rule final_results:
         'results/workflow_diagram.pdf'
 
 
-        
-
 rule help:
     """
     Print list of all targets with help.
@@ -87,27 +85,6 @@ rule standard_iqtree:
         expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
             fasta_name = fasta_names),
         'results/workflow_diagram.pdf'
-
-
-#rule restart_pb:
-#    """
-#    Restart pb chain 1 and 2. This is necessary if they have not yet converged.
-#    """
-#    input:
-#        ??????
-
-
-#rule clean_unexpected_chars:
-#    """
-#    """
-#    input:
-#
-#    output:
-#
-#    shell:
-#        """
-#        """
-#
 
 
 rule cdhit_subsets:
@@ -168,6 +145,8 @@ rule randomly_sample_seqs:
 
 rule combine_seqs:
     """
+    Generate a combined FASTA file by simply concatenating multiple FASTA files
+    together.
     """
     input:
         fasta_dir = 'results/reduced_subsets_samples_fasta/{fasta_name}_FASTA'
@@ -183,7 +162,7 @@ rule combine_seqs:
 
 rule cdhit_combined:
     """
-    ***Need to customize parameters! 
+    Run CD-HIT on combined FASTA file to remove redundant sequences.
     """
     input:
         concat_fasta_file = 'results/combined_fasta/{fasta_name}.faa'
@@ -202,6 +181,7 @@ rule cdhit_combined:
 
 rule muscle:
     """
+    Align a FASTA file using MUSCLE.
     """
     input:
         nonredun_fasta_file = 'results/reduced_combined_fasta/{fasta_name}.faa'
@@ -221,6 +201,7 @@ rule muscle:
 
 rule trimal_trim:
     """
+    Trim positions from a sequence alignment using TrimAl.
     """
     input:
         aligned_fasta_file = 'results/aligned_fasta_coded/{fasta_name}.afaa'
@@ -247,6 +228,7 @@ rule trimal_trim:
 
 rule trimal_reduce_seqs:
     """
+    Remove non-representative sequences from an alignment using TrimAl.
     """
     input:
         aligned_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
@@ -266,10 +248,6 @@ rule trimal_reduce_seqs:
                 $(echo {output.trimmed_fasta_file} | cut -f 1 -d '.')'_trimming_record.html' \
                 -resoverlap 0.0 \
                 -seqoverlap 0
-
-        #-clusters 100
-        #-resoverlap 0.0 \
-        #-seqoverlap 0
 
         """
 
@@ -299,12 +277,8 @@ rule afa_to_phy:
 
 rule modelfinder:
     """
-
-    ModelFinder Citation:
-
-    S. Kalyaanamoorthy, B.Q. Minh, T.K.F. Wong, A. von Haeseler, and L.S.
-    Jermiin (2017) ModelFinder: fast model selection for accurate phylogenetic
-    estimates.Nat. Methods, 14:587–589. DOI:10.1038/nmeth.4285
+    Find the best-fit model of amino acid sequence evolution using ModelFinder
+    from the IQ-TREE package.
     """
     input:
         trimmed_fasta_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
@@ -327,6 +301,8 @@ rule modelfinder:
 
 rule parse_modelfinder:
     """
+    Extract the name of the best-fit model identified by ModelFinder from the
+    ModelFinder output, and write to a text file.
     """
     input:
         model_file = 'results/modelfinder_output/{fasta_name}.iqtree'
@@ -348,6 +324,7 @@ rule parse_modelfinder:
 
 rule fasttree:
     """
+    Run FastTree on a trimmed sequence alignment.
     """
     input:
         trimmed_fasta_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
@@ -366,6 +343,7 @@ rule fasttree:
 
 rule visualize_fasttree:
     """
+    Render the newick tree output by FastTree as a phylogram in PDF format.
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
@@ -576,12 +554,7 @@ rule decode_fasttree_names:
 
 rule iqtree_ultrafast:
     """
-
-    Ultrafast Bootstrapping Citation:
-
-    D.T. Hoang, O. Chernomor, A. von Haeseler, B.Q. Minh, and L.S. Vinh (2018)
-    UFBoot2: Improving the ultrafast bootstrap approximation. Mol.  Biol.
-    Evol., 35:518–522. https://doi.org/10.1093/molbev/msx281
+    Perform ultrafast bootstrapping with IQ-TREE.
     """
     input:
         phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy',
@@ -634,6 +607,7 @@ rule iqtree_standard:
 
 rule visualize_iqtree_ultrafast:
     """
+    Render the newick tree output by IQ-TREE as a phylogram in PDF format.
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
@@ -653,6 +627,7 @@ rule visualize_iqtree_ultrafast:
 
 rule visualize_iqtree_standard:
     """
+    Render the newick tree output by IQ-TREE as a phylogram in PDF format.
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
@@ -672,6 +647,7 @@ rule visualize_iqtree_standard:
 
 rule visualize_pb:
     """
+    Render the newick tree output by Phylobayes as a phylogram in PDF format.
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
@@ -749,6 +725,9 @@ rule decode_boots_on_pb:
 
 rule visualize_boots_on_pb:
     """
+    Render the newick tree output by Phylobayes with both posterior
+    probabilities from Phylobayes and bootstrap values from IQ-TREE as a
+    phylogram in PDF format.
     """
     input:
         script = 'workflow/scripts/visualize_boots_on_pb.py',
@@ -771,18 +750,7 @@ rule visualize_boots_on_pb:
 
 rule pb_chain_one:
     """
-    Requires Phylobayes version 1.4c executable files to be in the $PATH, so
-    that they can be called from the commandline.
-
-    Phylobayes can be downloaded here:
-    http://www.atgc-montpellier.fr/phylobayes/
-
-    Phylobayes citations:
-
-    Lartillot, N., Philippe, H., 2004. A Bayesian Mixture Model for Across-Site
-    Heterogeneities in the Amino-Acid Replacement Process. Molecular Biology
-    and Evolution 21, 1095–1109. https://doi.org/10.1093/molbev/msh112
-
+    Run one MCMC tree-searching chain using Phylobayes.
     """
     input:
         phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
@@ -805,18 +773,7 @@ rule pb_chain_one:
 
 rule pb_chain_two:
     """
-    Requires Phylobayes version 1.4c executable files to be in the $PATH, so
-    that they can be called from the commandline.
-
-    Phylobayes can be downloaded here:
-    http://www.atgc-montpellier.fr/phylobayes/
-
-    Phylobayes citations:
-
-    Lartillot, N., Philippe, H., 2004. A Bayesian Mixture Model for Across-Site
-    Heterogeneities in the Amino-Acid Replacement Process. Molecular Biology
-    and Evolution 21, 1095–1109. https://doi.org/10.1093/molbev/msh112
-
+    Run one MCMC tree-searching chain using Phylobayes.
     """
     input:
         phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
@@ -839,6 +796,8 @@ rule pb_chain_two:
 
 rule trace_pb_chains:
     """
+    Generate a consensus tree with posterior probabilities from two Phylobayes
+    chains (and generate files with measures of convergence).
     """
     input:
         topology_file_1 =\
