@@ -102,9 +102,6 @@ if __name__ == '__main__':
     pb_newick_boots_only = cmdln[2]
     output_file_path = cmdln[3]
 
-    # Define query ID present in filename.
-    query_id = os.path.basename(tf)[2:].rsplit('_', 1)[0]
-
     # Initiate a tree style.
     ts = TreeStyle()
     ts.show_leaf_name = False
