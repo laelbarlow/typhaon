@@ -104,7 +104,7 @@ resources
   alignment with [TrimAl](http://trimal.cgenomics.org/), and run a very quick
   phylogenetic analysis with [FastTree](http://microbesonline.org/fasttree/) to
   identify any obvious issues before proceeding with more time-intensive
-  methods.
+  methods. Snakemake standard output will be written to the file `nohup.out`.
   ```
   make run_fasttree
   ```
