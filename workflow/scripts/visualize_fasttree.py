@@ -27,6 +27,7 @@ import matplotlib
 from matplotlib.pyplot import imread
 import matplotlib.pyplot as plt
 from xvfbwrapper import Xvfb
+from sys import platform
 
 
 def add_support_to_nodes_as_faces(t):
@@ -103,16 +104,30 @@ if __name__ == '__main__':
 
     # Write tree to pdf.
 
-    ## Use this for running on personal computer:
-    #t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
-    
-    # Use this for running on a cluster:
-    vdisplay = Xvfb()
-    vdisplay.start()
-    try:
+    if platform == "linux" or platform == "linux2":
+        # linux
+
+        # Use this for running on a cluster:
+        vdisplay = Xvfb()
+        vdisplay.start()
+        try:
+            t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
+        finally:
+            vdisplay.stop()
+
+    elif platform == "darwin":
+        # OS X
+
+        # Use this for running on personal computer:
         t2.render(output_file_path, tree_style=ts, w=8.5, h=11, units='in', dpi=600)
-    finally:
-        vdisplay.stop()
+
+    elif platform == "win32":
+        # Windows...
+        assert platform != "win32", """This software has not been tested on
+        Windows operating systems."""
+
+    else:
+        assert 2!=2, """Unable to identify opterating system."""
 
 
     #####################################################
