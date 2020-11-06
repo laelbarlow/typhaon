@@ -90,6 +90,9 @@ rule standard_iqtree:
 rule cdhit_subsets:
     """
     Reduce redundancy of sequences in each input file.
+
+    If "ESSENTIAL" is in a FASTA file name, then no sequences will be removed
+    from it, and it will simply be copied to the output directory.
     """
     input:
         files = input_fasta_files,
@@ -104,12 +107,16 @@ rule cdhit_subsets:
     shell:
         """
         mkdir -p {output.fasta_dir} && \
-        for X in {input.fasta_dir}/*.faa; do 
+        for X in {input.fasta_dir}/*.faa; do \
+          if [[ "$X" == *"ESSENTIAL"* ]] 
+          then 
+            cp $X {output.fasta_dir}/$( basename $X ) 
+          else 
             cd-hit -i $X -o {output.fasta_dir}/$( basename $X ) \
                 -n 5 \
-                -c 0.70 \
-            ; done
-
+                -c 0.70 
+          fi 
+        done
         """
 
 
@@ -118,6 +125,9 @@ rule randomly_sample_seqs:
     Randomly sample a given maximum number of sequences (without replacement)
     from each input FASTA file. A seed number is specified for random sampling,
     so sampling is reproducible.
+
+    If "ESSENTIAL" is in a FASTA file name, then no sequences will be removed
+    from it, and it will simply be copied to the output directory.
     """
     input:
         script = 'workflow/scripts/randomly_sample_seqs.py',
@@ -163,6 +173,9 @@ rule combine_seqs:
 rule cdhit_combined:
     """
     Run CD-HIT on combined FASTA file to remove redundant sequences.
+
+    The purpose of this step is simply to remove redundant sequences that may
+    have been present in more than one input file.
     """
     input:
         concat_fasta_file = 'results/combined_fasta/{fasta_name}.faa'
@@ -176,8 +189,9 @@ rule cdhit_combined:
     shell:
         """
         cd-hit -i {input.concat_fasta_file} -o {output.nonredun_fasta_file} \
-            -c 0.90
+            -c 1.0
         """
+
 
 rule muscle:
     """
