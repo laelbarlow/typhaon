@@ -105,7 +105,6 @@ if test "$(command -v conda)"; then
 else
   # Install dependencies in virtual environment using pip.
   if [ ! -d "$DIR" ]; then
-    #virtualenv --no-download $DIR 
     python3 -m venv $DIR 
     source $DIR/bin/activate
     pip install --upgrade pip
@@ -113,7 +112,7 @@ else
     pip install numpy==1.18.1
     pip install graphviz==0.13.2
     pip install requests
-    pip install snakemake
+    pip install snakemake==5.26.1
   else
     # Otherwise, just activate the environment.
     source $DIR/bin/activate
