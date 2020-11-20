@@ -2,28 +2,25 @@
 # Typhaon: A workflow for phylogentic analysis of protein families
 
 
-## Objectives
+## Objective
 
-As a starting point for further investigation, obtain phylogenetic analysis
-results for one or more sets of predicted peptide sequences for homologous
-genes (that is, genes that all encode at least one shared homologous domain),
-including summary of topology and branch supports in a figure.
+Perform phylogenetic analysis of one or more sets of predicted peptide
+sequences for homologous genes using both Maximum Likelihood (ML) and Bayesian
+Inference (BI) methods, and generate a phylograms in PDF format with a
+combination of branch ML and BI support values.
 
 
 ## Rationale
 
-- In the absence of major sequence alignment errors, all standard phylogetic
-  analysis steps for a typical protein-coding gene family are quite predictable
-  and can therefore be automated.
-- Performing phylogenetic analysis programmatically, especially using the
-  Snakemake workflow manager, helps make analyses reproducible.
-
-
-## Assumptions regarding input sequences
-
-- All input sequence file names end with the extension '.faa'.
-- All sequences within sets input for alignment share homology, at least in
-  some significant subsequence. 
+Phylogenetic analysis of single-gene families involves numerous steps (see
+workflow diagram below), implying that numerous commands must be entered or
+jobs submitted to a cluster (or webservice) for each set of sequences analyzed.
+In the absence of major sequence alignment errors, most if not all standard
+phylogetic analysis steps for a typical protein-coding gene family are quite
+routine and can therefore be programmed. Also, performing phylogenetic analysis
+programmatically, especially using the [Snakemake workflow
+manager](https://snakemake.readthedocs.io/en/stable/), helps make analyses
+reproducible.
 
 
 ## Software requirements
@@ -31,7 +28,9 @@ including summary of topology and branch supports in a figure.
 - Linux Sun Grid Engine (SGE) computing cluster. This has not been tested on
   other cluster types. Only partial functionality is available if installed on
   a Linux of MacOS personal computer. 
-- Python3 and the Conda package manager.
+- Python3 and the [Conda package and environment
+  manager](https://docs.conda.io/en/latest/) (Conda is not available on all
+  clusters).
 
 
 ## Overview of programmed workflow steps
@@ -44,7 +43,7 @@ including summary of topology and branch supports in a figure.
 ## Procedure 
 
 - Clone the code repository from github to your computer by running the
-  following command in your terminal:
+  following shell command in your terminal:
   ```
   git clone https://github.com/laelbarlow/typhaon.git
   ```
@@ -61,8 +60,44 @@ including summary of topology and branch supports in a figure.
   make dry_run
   ```
 
-- Run a very quick phylogenetic analysis to identify any obvious issues before
-  proceeding with more time-intensive methods.
+- Prepare input files in the 'resources' directory. All input sequence files
+  must be in FASTA format and file name must end with the extension '.faa'.
+  Sets of one or more FASTA files must be assembled into directories with names
+  ending with '_FASTA'. Directory and file names must not contain space
+  characters. For example, below is what input directories in the resources
+  directory might look like. Sequences from files within each directory will be
+  combined and aligned for analysis, but sequences from different directories
+  will not be combined.
+```
+resources
+├── Protein_A_FASTA
+│   ├── Protein_A1_homologues.faa
+│   ├── Protein_A2_homologues.faa
+│   ├── Protein_A3_homologues.faa
+│   └── Protein_A4_homologues.faa
+└── Protein_B_FASTA
+    ├── Protein_B1_homologues.faa
+    ├── Protein_B2_homologues.faa
+    ├── Protein_B3_homologues.faa
+    └── Protein_B4_homologues.faa
+```
+
+- To customize parameters for any of the various software packages used in this
+  workflow, modify the `workflow/Snakefile` file. This is important, as default
+  parameters are unlikely to be appropriate for your particular analysis. Pay
+  particular attention to rules that use
+  [CD-HIT](http://www.bioinformatics.org/cd-hit/cd-hit-user-guide.pdf) and
+  random sampling to exclude sequences from the final alignment for
+  phylogenetic analysis, as this is critical for obtaining a representative yet
+  computationally manageable set of sequences.
+
+- Remove redundant sequences with
+  [CD-HIT](http://www.bioinformatics.org/cd-hit/cd-hit-user-guide.pdf), align
+  sequences with [MUSCLE](http://www.drive5.com/muscle/muscle.html), trim
+  alignment with [TrimAl](http://trimal.cgenomics.org/), and run a very quick
+  phylogenetic analysis with [FastTree](http://microbesonline.org/fasttree/) to
+  identify any obvious issues before proceeding with more time-intensive
+  methods. Snakemake standard output will be written to the file `nohup.out`.
   ```
   make run_fasttree
   ```
@@ -70,27 +105,33 @@ including summary of topology and branch supports in a figure.
 - Observe the resulting sequence alignment(s) and tree topology in the results
   directory.
 
-- Run IQ-TREE with ultrafast bootstrapping.
+- Run [IQ-TREE](http://www.iqtree.org/doc/) with ultrafast bootstrapping.
   ```
   make run_ultrafast_iqtree
   ```
 
-- Run IQ-TREE with standard non-parametric bootstrapping.
+- Run [IQ-TREE](http://www.iqtree.org/doc/) with standard non-parametric bootstrapping.
   ```
   make run_standard_iqtree
   ```
 
-- Run full analysis including Phylobayes, and map support values from IQ-TREE
-  standard bootstrapping onto Phylobayes topology.
+- Run full analysis including
+  [Phylobayes](https://github.com/bayesiancook/pbmpi), and map support values
+  from [IQ-TREE](http://www.iqtree.org/doc/) standard bootstrapping onto
+  [Phylobayes](https://github.com/bayesiancook/pbmpi) topology. Output file(s)
+  will be written to the `results/phylobayes_pdf_with_boots` directory.
   ```
   make run
   ```
+
+- After running a full analysis including Phylobayes, check that phylobayes
+  chains 1 and 2 reached convergence (refer to the [Phylobayes MPI
+  manual](https://github.com/bayesiancook/pbmpi)).
 
 - Archive a completed analysis for later reproduction.
   ```
   make archive
   ```
-
 
 ## License
 

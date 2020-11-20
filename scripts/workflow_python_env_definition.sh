@@ -8,27 +8,27 @@
 # Determine snakemake profile name.
 source scripts/determine_snakemake_profile.sh
 
-# Determine whether packages can be loaded using the 'module' command.
-if test "$(command -v module)"; then
-    # Use the 'module' command to load Python and Singularity modules.
-
-    # Load appropriate version of Python.
-    # (tested using 3.7.4).
-    module load python/3.7
-
-    # Load an appropriate version of Singularity.
-    module load singularity/3.5
-
-else
-    # Print the versions.
-    echo ""
-    echo Using this version of Python:
-    python3 --version
-    echo ""
-    echo Using this version of Singularity:
-    singularity --version
-
-fi
+## Determine whether packages can be loaded using the 'module' command.
+#if test "$(command -v module)"; then
+#    # Use the 'module' command to load Python and Singularity modules.
+#
+#    # Load appropriate version of Python.
+#    # (tested using 3.7.4).
+#    module load python/3.7
+#
+#    # Load an appropriate version of Singularity.
+#    module load singularity/3.5
+#
+#else
+#    # Print the versions.
+#    echo ""
+#    echo Using this version of Python:
+#    python3 --version
+#    echo ""
+#    echo Using this version of Singularity:
+#    singularity --version
+#
+#fi
 
 # Check that Python can be used.
 if test "$(command -v python3)"; then
@@ -38,13 +38,13 @@ else
     exit 1
 fi
 
-# Check that Singularity can be used.
-if test "$(command -v singularity)"; then
-    echo ""
-else
-    echo Unable to access Singularity.
-    exit 1
-fi
+## Check that Singularity can be used.
+#if test "$(command -v singularity)"; then
+#    echo ""
+#else
+#    echo Unable to access Singularity.
+#    exit 1
+#fi
 
 # Define path to directory to contain python virtual environment files
 # (installation of dependencies)
@@ -105,7 +105,6 @@ if test "$(command -v conda)"; then
 else
   # Install dependencies in virtual environment using pip.
   if [ ! -d "$DIR" ]; then
-    #virtualenv --no-download $DIR 
     python3 -m venv $DIR 
     source $DIR/bin/activate
     pip install --upgrade pip
@@ -113,7 +112,7 @@ else
     pip install numpy==1.18.1
     pip install graphviz==0.13.2
     pip install requests
-    pip install snakemake
+    pip install snakemake==5.26.1
   else
     # Otherwise, just activate the environment.
     source $DIR/bin/activate
