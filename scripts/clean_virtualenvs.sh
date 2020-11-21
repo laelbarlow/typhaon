@@ -18,7 +18,7 @@ confirm() {
 if test "$(command -v conda)"; then
     confirm conda env remove --name conda_env_typhaon
 else
-    confirm rm -rf ~/env_typhaon
+    confirm rm -rf ~/env_typhaon_snakemake_workflow
 fi
 
 

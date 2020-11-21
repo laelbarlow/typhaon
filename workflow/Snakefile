@@ -308,6 +308,7 @@ rule modelfinder:
         iqtree \
               -s {input.trimmed_fasta_file} \
               -pre $(echo {output.model_file} | cut -f 1 -d '.') \
+              -nt AUTO \
               -m MF \
               -madd C10,C20,C30,C40,C50,C60,LG4X,LG4M
         """
@@ -584,6 +585,7 @@ rule iqtree_ultrafast:
         """
         iqtree \
             -s {input.phylip_file} \
+            -nt AUTO \
             -m $(cat {input.model_text_file}) \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
             -B 1000
@@ -614,8 +616,9 @@ rule iqtree_standard:
         #-m $(cat {input.model_text_file})
         iqtree \
             -s {input.phylip_file} \
-            -m C20 \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
+            -nt AUTO \
+            -m C20 \
             -b 100
         """
 
