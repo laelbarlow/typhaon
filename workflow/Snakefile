@@ -599,7 +599,6 @@ rule iqtree_standard:
     ultrafast bootstrapping, at least for single-gene/protein analyses.
     """
     input:
-        #model_text_file = 'results/modelfinder_output/{fasta_name}.txt',
         phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
 
     output:
@@ -613,7 +612,6 @@ rule iqtree_standard:
 
     shell:
         """
-        #-m $(cat {input.model_text_file})
         iqtree \
             -s {input.phylip_file} \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
