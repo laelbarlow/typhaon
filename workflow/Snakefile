@@ -193,9 +193,32 @@ rule cdhit_combined:
         """
 
 
-rule muscle:
+#rule muscle:
+#    """
+#    Align a FASTA file using MUSCLE.
+#    """
+#    input:
+#        nonredun_fasta_file = 'results/reduced_combined_fasta/{fasta_name}.faa'
+#
+#    output:
+#        aligned_fasta_file = 'results/aligned_fasta/{fasta_name}.afaa'
+#
+#    conda:
+#        'envs/muscle.yaml'
+#
+#    shell:
+#        """
+#        muscle -in {input.nonredun_fasta_file} \
+#               -out {output.aligned_fasta_file}
+#        """
+
+
+rule mafft:
     """
-    Align a FASTA file using MUSCLE.
+    Align a FASTA file using MAFFT.
+
+    See documentation here for choosing paramaters:
+        https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html
     """
     input:
         nonredun_fasta_file = 'results/reduced_combined_fasta/{fasta_name}.faa'
@@ -204,12 +227,11 @@ rule muscle:
         aligned_fasta_file = 'results/aligned_fasta/{fasta_name}.afaa'
 
     conda:
-        'envs/muscle.yaml'
+        'envs/mafft.yaml'
 
     shell:
         """
-        muscle -in {input.nonredun_fasta_file} \
-               -out {output.aligned_fasta_file}
+        mafft --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file}
         """
 
 

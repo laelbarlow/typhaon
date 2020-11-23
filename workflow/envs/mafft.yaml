@@ -1,5 +1,5 @@
-name: muscle
+name: mafft
 channels:
     - bioconda
 dependencies:
-    - muscle=3.8.1551
+    - mafft=7.471
