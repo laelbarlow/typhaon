@@ -84,7 +84,8 @@ if __name__ == '__main__':
     ts.show_leaf_name = False
 
     # Parse tree.
-    t1 = Tree(tf, format=3)
+    #t1 = Tree(tf, format=3)
+    t1 = Tree(tf, format=0)
     #print(t1)
 
     # Make a copy of the TreeNode object.
