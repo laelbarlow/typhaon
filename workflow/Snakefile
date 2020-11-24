@@ -18,7 +18,7 @@ input_fasta_files = glob.glob(os.path.join(
 
 # Check input data formatting.
 for input_dir in input_fasta_dirs:
-    files = glob.glob(os.path.join( os.path.join(input_dir, '*.afaa'))
+    files = glob.glob(os.path.join(input_dir, '*.afaa'))
     files_identified_as_guide_alignments = \
     [x for x in files if 'GUIDE' in x]
     assert len(files_identified_as_guide_alignments) <= 1, """More than one
