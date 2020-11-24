@@ -231,7 +231,7 @@ rule mafft:
 
     shell:
         """
-        mafft --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file}
+        mafft --thread 4 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file}
         """
 
 
