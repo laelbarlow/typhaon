@@ -1,5 +1,8 @@
 name: mafft
 channels:
     - bioconda
+    - anaconda
 dependencies:
+    - python=3.8
+    - biopython=1.78
     - mafft=7.471

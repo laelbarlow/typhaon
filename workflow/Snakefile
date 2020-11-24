@@ -16,6 +16,16 @@ input_fasta_files = glob.glob(os.path.join(
                                                '*_FASTA'), 
                                   '*.faa'))
 
+# Check input data formatting.
+for input_dir in input_fasta_dirs:
+    files = glob.glob(os.path.join( os.path.join(input_dir, '*.afaa'))
+    files_identified_as_guide_alignments = \
+    [x for x in files if 'GUIDE' in x]
+    assert len(files_identified_as_guide_alignments) <= 1, """More than one
+    guide alignment detected in directory: %s""" % input_dir
+
+# Define which rules are to be run without submitting to a cluster via a job
+# scheduler.
 localrules: final_results, help, superfast_fasttree, ultrafast_iqtree
 
 
@@ -221,6 +231,9 @@ rule mafft:
         https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html
     """
     input:
+        script =\
+        'workflow/scripts/remove_guide_alignment_seqs.py',
+        fasta_dir = 'resources/{fasta_name}_FASTA',
         nonredun_fasta_file = 'results/reduced_combined_fasta/{fasta_name}.faa'
 
     output:
@@ -231,11 +244,21 @@ rule mafft:
 
     shell:
         """
-        # DASH options:
-        # --dash --originalseqonly 
-        #
-        # Run command: 
-        mafft --thread -1 --auto {input.nonredun_fasta_file} > {output.aligned_fasta_file}
+        guide_alignment="" && \
+        for X in {input.fasta_dir}/*.afaa; do \
+          if [[ "$X" == *"GUIDE"* ]]  
+          then  
+            guide_alignment=$X 
+          fi 
+        done && \
+        echo $guide_alignment && \
+        if [[ "$guide_alignment" == "" ]]  
+        then 
+          mafft --thread -1 --auto {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+        else 
+          mafft --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
+          python3 {input.script} {output.aligned_fasta_file} $guide_alignment
+        fi
         """
 
 

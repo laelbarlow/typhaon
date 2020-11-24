@@ -67,17 +67,22 @@ reproducible.
   characters. For example, below is what input directories in the resources
   directory might look like. Sequences from files within each directory will be
   combined and aligned for analysis, but sequences from different directories
-  will not be combined.
+  will not be combined. Also, if a file contains "ESSENTIAL" in the filename,
+  then it will not be filtered using CD-HIT (the "cdhit_subsets" rule), and if
+  a .afaa (FASTA alignment) file is present with "GUIDE" in the filename, then
+  this alignment will be used to guide alignment of sequences in the .faa files
+  in that directory (the "mafft" rule).
 ```
 resources
 ├── Protein_A_FASTA
+│   ├── Protein_A_GUIDE.afaa
 │   ├── Protein_A1_homologues.faa
 │   ├── Protein_A2_homologues.faa
 │   ├── Protein_A3_homologues.faa
 │   └── Protein_A4_homologues.faa
 └── Protein_B_FASTA
     ├── Protein_B1_homologues.faa
-    ├── Protein_B2_homologues.faa
+    ├── Protein_B2_homologuesESSENTIAL.faa
     ├── Protein_B3_homologues.faa
     └── Protein_B4_homologues.faa
 ```
