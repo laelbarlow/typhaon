@@ -98,7 +98,7 @@ resources
 
 - Remove redundant sequences with
   [CD-HIT](http://www.bioinformatics.org/cd-hit/cd-hit-user-guide.pdf), align
-  sequences with [MUSCLE](http://www.drive5.com/muscle/muscle.html), trim
+  sequences with [MAFFT](https://mafft.cbrc.jp/alignment/software/), trim
   alignment with [TrimAl](http://trimal.cgenomics.org/), and run a very quick
   phylogenetic analysis with [FastTree](http://microbesonline.org/fasttree/) to
   identify any obvious issues before proceeding with more time-intensive
