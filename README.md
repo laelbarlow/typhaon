@@ -27,7 +27,7 @@ reproducible.
 
 - Linux Sun Grid Engine (SGE) computing cluster. This has not been tested on
   other cluster types. Only partial functionality is available if installed on
-  a Linux of MacOS personal computer. 
+  a Linux or MacOS personal computer. 
 - Python3 and the [Conda package and environment
   manager](https://docs.conda.io/en/latest/) (Conda is not available on all
   clusters).
@@ -61,17 +61,18 @@ reproducible.
   ```
 
 - Prepare input files in the 'resources' directory. All input sequence files
-  must be in FASTA format and file name must end with the extension '.faa'.
-  Sets of one or more FASTA files must be assembled into directories with names
-  ending with '_FASTA'. Directory and file names must not contain space
-  characters. For example, below is what input directories in the resources
-  directory might look like. Sequences from files within each directory will be
-  combined and aligned for analysis, but sequences from different directories
-  will not be combined. Also, if a file contains "ESSENTIAL" in the filename,
-  then it will not be filtered using CD-HIT (the "cdhit_subsets" rule), and if
-  a .afaa (FASTA alignment) file is present with "GUIDE" in the filename, then
-  this alignment will be used to guide alignment of sequences in the .faa files
-  in that directory (the "mafft" rule).
+  for phylogenetic analysis must be in FASTA format and file name must end with
+      the extension '.faa'.  Sets of one or more FASTA files must be assembled
+      into directories with names ending with '_FASTA'. Directory and file
+      names must not contain space characters. For example, below is what input
+      directories in the resources directory might look like. Sequences from
+      files within each directory will be combined and aligned for analysis,
+      but sequences from different directories will not be combined. Also, if a
+      file contains "ESSENTIAL" in the filename, then it will not be filtered
+      using CD-HIT (the "cdhit_subsets" rule), and if a .afaa (FASTA alignment)
+      file is present with "GUIDE" in the filename, then this alignment will be
+      used to guide alignment of sequences in the .faa files in that directory
+      (the "mafft" rule).
 ```
 resources
 ├── Protein_A_FASTA
