@@ -8,27 +8,26 @@
 # Determine snakemake profile name.
 source scripts/determine_snakemake_profile.sh
 
-## Determine whether packages can be loaded using the 'module' command.
-#if test "$(command -v module)"; then
-#    # Use the 'module' command to load Python and Singularity modules.
-#
-#    # Load appropriate version of Python.
-#    # (tested using 3.7.4).
-#    module load python/3.7
-#
-#    # Load an appropriate version of Singularity.
-#    module load singularity/3.5
-#
-#else
-#    # Print the versions.
-#    echo ""
-#    echo Using this version of Python:
-#    python3 --version
-#    echo ""
-#    echo Using this version of Singularity:
-#    singularity --version
-#
-#fi
+# Determine whether packages can be loaded using the 'module' command.
+if test "$(command -v module)"; then
+    # Use the 'module' command to load Python and Singularity modules.
+
+    # Load appropriate version of Python.
+    module load python/3.8
+
+    ## Load an appropriate version of Singularity.
+    #module load singularity/3.6
+
+else
+    # Print the versions.
+    echo ""
+    echo Using this version of Python:
+    python3 --version
+    #echo ""
+    #echo Using this version of Singularity:
+    #singularity --version
+
+fi
 
 # Check that Python can be used.
 if test "$(command -v python3)"; then
@@ -108,11 +107,22 @@ else
     python3 -m venv $DIR 
     source $DIR/bin/activate
     pip install --upgrade pip
-    pip install matplotlib==3.2.1
-    pip install numpy==1.18.1
-    pip install graphviz==0.13.2
+    pip install setuptools wheel
     pip install requests
-    pip install snakemake==5.26.1
+    pip install \
+    numpy==1.18.1 \
+    biopython==1.78 \
+    gffutils==0.10.1 \
+    pypdf2==1.26.0 \
+    reportlab==3.5.51 \
+    pandoc==2.0a4 \
+    pandas==1.1.3 \
+    matplotlib==3.3.2 \
+    graphviz==0.14.2 \
+    xvfbwrapper==0.2.9 \
+    ete3==3.1.2 \
+    snakemake==5.26.1
+
   else
     # Otherwise, just activate the environment.
     source $DIR/bin/activate
