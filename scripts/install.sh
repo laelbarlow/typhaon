@@ -73,7 +73,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
         mkdir -p ~/.config/snakemake
         cd ~/.config/snakemake
-        cookiecutter https://github.com/Snakemake-Profiles/slurm_typhaon.git \
+        cookiecutter https://github.com/Snakemake-Profiles/slurm.git \
             profile_name="slurm_typhaon" \
             cluster_config="cluster_config.yaml"
         cd -
