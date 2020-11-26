@@ -82,7 +82,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         # Copy cluster_config.yaml example file from resources directory to
         # profile files.
         cp resources/example_slurm_cluster_config.yaml \
-        ~/.config/snakemake/slurm/cluster_config.yaml
+        ~/.config/snakemake/slurm_typhaon/cluster_config.yaml
 
         ## Update value of the CLUSTER_CONFIG variable in the submission
         ## python file with the name of the cluster_config.yaml file.
