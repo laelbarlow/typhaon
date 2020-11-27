@@ -659,7 +659,7 @@ rule iqtree_standard:
     conda:
         'envs/iqtree_ultrafast.yaml'
 
-    threads: '8'
+    threads: 8
 
     shell:
         """
