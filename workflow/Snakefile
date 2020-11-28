@@ -201,6 +201,11 @@ rule cdhit_combined:
     conda:
         'envs/cdhit.yaml'
 
+    envmodules:
+        'nixpkgs/16.09',
+        'gcc/7.3.0',
+        'cd-hit/4.8.1'
+
     shell:
         """
         cd-hit -i {input.concat_fasta_file} -o {output.nonredun_fasta_file} \
@@ -247,6 +252,9 @@ rule mafft:
     conda:
         'envs/mafft.yaml'
 
+    envmodules:
+        'mafft/7.471'
+
     shell:
         """
         guide_alignment="" && \
@@ -280,6 +288,9 @@ rule trimal_trim:
     conda:
         'envs/trimal.yaml'
 
+    envmodules:
+        'trimal/1.4'
+
     shell:
         """
         #trimal -in {input.aligned_fasta_file} -out {output.trimmed_fasta_file} -gappyout
@@ -306,6 +317,9 @@ rule trimal_reduce_seqs:
 
     conda:
         'envs/trimal.yaml'
+
+    envmodules:
+        'trimal/1.4'
 
     shell:
         """
@@ -357,6 +371,10 @@ rule modelfinder:
     conda:
         'envs/modelfinder.yaml'
 
+    envmodules:
+        'gcc/9.3.0',
+        'iq-tree/2.0.7'
+
     shell:
         """
         iqtree \
@@ -403,6 +421,11 @@ rule fasttree:
 
     conda:
         'envs/fasttree.yaml'
+
+    envmodules:
+        'nixpkgs/16.09',
+        'gcc/7.3.0',
+        'fasttree/2.1.10'
 
     shell:
         """
@@ -635,6 +658,10 @@ rule iqtree_ultrafast:
     conda:
         'envs/iqtree_ultrafast.yaml'
 
+    envmodules:
+        'gcc/9.3.0',
+        'iq-tree/2.0.7'
+
     shell:
         """
         iqtree \
@@ -663,6 +690,10 @@ rule iqtree_standard:
 
     conda:
         'envs/iqtree_ultrafast.yaml'
+
+    envmodules:
+        'gcc/9.3.0',
+        'iq-tree/2.0.7'
 
     threads: 8
 
@@ -834,6 +865,14 @@ rule pb_chain_one:
     conda:
         'envs/phylobayes_mpi.yaml'
 
+    envmodules:
+        'nixpkgs/16.09',
+        'intel/2018.3',
+        'openmpi/3.1.4',
+        'phylobayes-mpi/20180420'
+
+    threads 8
+
     shell:
         """
         mpirun -n 8 pb_mpi -d {input.phylip_file} \
@@ -856,6 +895,14 @@ rule pb_chain_two:
 
     conda:
         'envs/phylobayes_mpi.yaml'
+
+    envmodules:
+        'nixpkgs/16.09',
+        'intel/2018.3',
+        'openmpi/3.1.4',
+        'phylobayes-mpi/20180420'
+
+    threads 8
 
     shell:
         """
@@ -883,6 +930,12 @@ rule trace_pb_chains:
 
     conda:
         'envs/phylobayes_mpi.yaml'
+
+    envmodules:
+        'nixpkgs/16.09',
+        'intel/2018.3',
+        'openmpi/3.1.4',
+        'phylobayes-mpi/20180420'
 
     shell:
         """
