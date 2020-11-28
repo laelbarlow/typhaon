@@ -114,6 +114,11 @@ rule cdhit_subsets:
     conda:
         'envs/cdhit.yaml'
 
+    envmodules:
+        'nixpkgs/16.09',
+        'gcc/7.3.0',
+        'cd-hit/4.8.1'
+
     shell:
         """
         mkdir -p {output.fasta_dir} && \
