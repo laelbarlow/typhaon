@@ -253,6 +253,7 @@ rule mafft:
         'envs/mafft.yaml'
 
     envmodules:
+        'StdEnv/2020',
         'mafft/7.471'
 
     shell:
