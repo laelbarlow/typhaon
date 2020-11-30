@@ -256,28 +256,32 @@ rule mafft:
     conda:
         'envs/mafft.yaml',
 
-    envmodules:
-        'StdEnv/2020',
-        'mafft/7.471'
-
     shell:
         """
-        guide_alignment="" && \
-        for X in {input.fasta_dir}/*.afaa; do \
-          if [[ "$X" == *"GUIDE"* ]]  
-          then  
-            guide_alignment=$X 
-          fi 
-        done && \
-        echo $guide_alignment && \
-        if [[ "$guide_alignment" == "" ]]  
-        then 
-          mafft --thread -1 --auto {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-        else 
-          mafft --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
-          python3 {input.script} {output.aligned_fasta_file} $guide_alignment
-        fi
+        python3 -c "import Bio"
         """
+
+#    envmodules:
+#        'StdEnv/2020',
+#        'mafft/7.471'
+#
+#        """
+#        guide_alignment="" && \
+#        for X in {input.fasta_dir}/*.afaa; do \
+#          if [[ "$X" == *"GUIDE"* ]]  
+#          then  
+#            guide_alignment=$X 
+#          fi 
+#        done && \
+#        echo $guide_alignment && \
+#        if [[ "$guide_alignment" == "" ]]  
+#        then 
+#          mafft --thread -1 --auto {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+#        else 
+#          mafft --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
+#          python3 {input.script} {output.aligned_fasta_file} $guide_alignment
+#        fi
+#        """
 
 
 rule trimal_trim:
