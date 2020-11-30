@@ -256,6 +256,9 @@ rule mafft:
     conda:
         'envs/mafft.yaml',
 
+    envmodules:
+        'python/3.8'
+
     shell:
         """
         python3 -c "import Bio"
