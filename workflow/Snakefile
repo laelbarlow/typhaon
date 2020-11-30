@@ -155,9 +155,6 @@ rule randomly_sample_seqs:
     conda:
         'envs/randomly_sample_seqs.yaml'
 
-    envmodules:
-        'StdEnv/2020'
-
     shell:
         """
         # (First argument is sample size.)

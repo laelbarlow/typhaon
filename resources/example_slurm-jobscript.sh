@@ -31,6 +31,8 @@
 ###
 ###phylobayes-mpi/20180420 
 
+# Activate python virtual environment.
+source scripts/workflow_python_env_definition.sh
 
 # Execute job.
 {exec_job}
