@@ -259,6 +259,7 @@ rule mafft:
     shell:
         """
         python3 -c "import Bio"
+        python3 {input.script}
         """
 
 #    envmodules:
