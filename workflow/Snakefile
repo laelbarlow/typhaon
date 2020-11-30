@@ -157,7 +157,7 @@ rule randomly_sample_seqs:
 
     envmodules:
         'StdEnv/2020',
-        'Python/3.8'
+        'python/3.8'
 
     shell:
         """
@@ -259,7 +259,7 @@ rule mafft:
     envmodules:
         'StdEnv/2020',
         'mafft/7.471',
-        'Python/3.7.7'
+        'python/3.8'
 
     shell:
         """
