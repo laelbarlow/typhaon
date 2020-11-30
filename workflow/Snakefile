@@ -258,7 +258,6 @@ rule mafft:
 
     envmodules:
         'StdEnv/2020',
-        'Python/3.8',
         'mafft/7.471'
 
     shell:
