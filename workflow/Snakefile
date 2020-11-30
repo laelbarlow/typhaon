@@ -257,7 +257,7 @@ rule mafft:
         'envs/mafft.yaml',
 
     envmodules:
-        'python/3.8'
+        'python/3.8.2'
 
     shell:
         """
