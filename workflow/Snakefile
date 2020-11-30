@@ -257,8 +257,6 @@ rule mafft:
         'envs/mafft.yaml',
 
     envmodules:
-        'StdEnv/2020',
-        'nixpkgs/16.09',
         'python/3.8.2'
 
     shell:
