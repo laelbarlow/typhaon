@@ -637,7 +637,8 @@ rule iqtree_ultrafast:
             -nt AUTO \
             -m $(cat {input.model_text_file}) \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
-            -B 1000
+            -B 1000 \
+            -bnni
         """
 
 
