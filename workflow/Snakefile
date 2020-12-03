@@ -157,7 +157,7 @@ rule randomly_sample_seqs:
 
         python3 {input.script} \
                     20 \
-                    54321 \
+                    53421 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
         """
