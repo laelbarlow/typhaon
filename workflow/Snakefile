@@ -73,6 +73,18 @@ rule superfast_fasttree:
         'results/workflow_diagram.pdf'
 
 
+rule one_ml_search_iqtree:
+    """
+    Get output files from partial analysis.
+    """
+    input:
+        expand('results/iqtree_one_ml_search_pdf/{fasta_name}.pdf', \
+            fasta_name = fasta_names),
+        expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
+            fasta_name = fasta_names),
+        'results/workflow_diagram.pdf'
+
+
 rule ultrafast_iqtree:
     """
     Get output files from partial analysis.
@@ -99,10 +111,7 @@ rule standard_iqtree:
 
 rule cdhit_subsets:
     """
-    Reduce redundancy of sequences in each input file.
-
-    If "ESSENTIAL" is in a FASTA file name, then no sequences will be removed
-    from it, and it will simply be copied to the output directory.
+    Reduce redundancy of sequences in each relevant input file.
     """
     input:
         files = input_fasta_files,
@@ -118,15 +127,91 @@ rule cdhit_subsets:
         """
         mkdir -p {output.fasta_dir} && \
         for X in {input.fasta_dir}/*.faa; do \
-          if [[ "$X" == *"ESSENTIAL"* ]] 
-          then 
-            cp $X {output.fasta_dir}/$( basename $X ) 
-          else 
+          if ! [[ "$X" == *"ESSENTIAL"* ]] 
+            then
             cd-hit -i $X -o {output.fasta_dir}/$( basename $X ) \
                 -n 5 \
-                -c 0.70 
-          fi 
-        done
+                -c 0.70
+          fi
+          done
+        """
+
+
+rule align_subsets:
+    """
+    Align a FASTA file using MAFFT.
+
+    See documentation here for choosing paramaters:
+        https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html
+        https://mafft.cbrc.jp/alignment/software/manual/manual.html
+    """
+    input:
+        nonredun_fasta_dir =\
+        'results/reduced_subsets_fasta/{fasta_name}_FASTA'
+
+    output:
+        aligned_fasta_dir =\
+        directory('results/reduced_subsets_aligned_fasta/{fasta_name}_FASTA')
+
+    conda:
+        'envs/mafft.yaml'
+
+    shell:
+        """
+        mkdir -p {output.aligned_fasta_dir} && \
+        for X in {input.nonredun_fasta_dir}/*.faa
+            do 
+            mafft --maxiterate 1000 --localpair --thread -1 $X > \
+                $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'
+            done
+        """
+
+
+rule seqbouncer:
+    """
+    Filter outlier sequences using the SequenceBouncer.py script written by
+    Cory D. Dunn, downloaded from GitHub
+    (https://github.com/corydunnlab/SequenceBouncer, commit ID:
+    50596c3a4f6372dd77586872d112417433bf2e83).
+
+    Citation:
+         SequenceBouncer: A method to remove outlier entries from a multiple
+         sequence alignment Cory D. Dunn bioRxiv 2020.11.24.395459; doi:
+         https://doi.org/10.1101/2020.11.24.395459
+
+    Note: If the -k option is set to zero, then all sequences with median "nCS"
+    scores above the 75th percentile will be excluded.
+    """
+    input:
+        sequence_bouncer_script = 'workflow/scripts/SequenceBouncer.py',
+        fasta_unalignment_script = 'workflow/scripts/afa_to_fa.py',
+        aligned_fasta_dir =\
+        'results/reduced_subsets_aligned_fasta/{fasta_name}_FASTA'
+
+    output:
+        filtered_fasta_dir =\
+        directory('results/reduced_subsets_filtered_fasta/{fasta_name}_FASTA')
+
+    conda:
+        'envs/seqbouncer.yaml'
+
+    shell:
+        """
+        mkdir -p {output.filtered_fasta_dir} && \
+        for X in {input.aligned_fasta_dir}/*.afaa; do \
+            python3 {input.sequence_bouncer_script} \
+              -i $X \
+              -o $(echo {output.filtered_fasta_dir}/$( basename $X ) | cut -f 1 -d '.') \
+              -g 20 \
+              -s 3 \
+              -k -0.5 \
+            && \
+            python3 {input.fasta_unalignment_script} \
+                       $(echo {output.filtered_fasta_dir}/$( basename $X) \
+                           | cut -f 1 -d '.')'_output_clean.fasta' \
+                       $(echo {output.filtered_fasta_dir}/$( basename $X) \
+                           | cut -f 1 -d '.')'.faa'
+            done
         """
 
 
@@ -135,13 +220,11 @@ rule randomly_sample_seqs:
     Randomly sample a given maximum number of sequences (without replacement)
     from each input FASTA file. A seed number is specified for random sampling,
     so sampling is reproducible.
-
-    If "ESSENTIAL" is in a FASTA file name, then no sequences will be removed
-    from it, and it will simply be copied to the output directory.
     """
     input:
         script = 'workflow/scripts/randomly_sample_seqs.py',
-        fasta_dir = 'results/reduced_subsets_fasta/{fasta_name}_FASTA'
+        fasta_dir =\
+        'results/reduced_subsets_filtered_fasta/{fasta_name}_FASTA'
 
     output:
         fasta_dir =\
@@ -156,8 +239,8 @@ rule randomly_sample_seqs:
         # (Second argument is seed for random sampling.)
 
         python3 {input.script} \
-                    20 \
-                    53421 \
+                    15 \
+                    15930 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
         """
@@ -169,14 +252,22 @@ rule combine_seqs:
     together.
     """
     input:
-        fasta_dir = 'results/reduced_subsets_samples_fasta/{fasta_name}_FASTA'
+        fasta_dir1 = 'resources/{fasta_name}_FASTA',
+        fasta_dir2 = 'results/reduced_subsets_samples_fasta/{fasta_name}_FASTA'
 
     output:
         concat_fasta_file = 'results/combined_fasta/{fasta_name}.faa'
 
     shell:
         """
-        for X in {input.fasta_dir}/*.faa; do cat $X >> {output.concat_fasta_file}; done
+        for X in {input.fasta_dir1}/*.faa; do \
+          if [[ "$X" == *"ESSENTIAL"* ]] 
+            then
+            cat $X >> {output.concat_fasta_file}
+          fi 
+        done \
+        && \
+        for X in {input.fasta_dir2}/*.faa; do cat $X >> {output.concat_fasta_file}; done
         """
 
 
@@ -229,6 +320,7 @@ rule mafft:
 
     See documentation here for choosing paramaters:
         https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html
+        https://mafft.cbrc.jp/alignment/software/manual/manual.html
     """
     input:
         script =\
@@ -254,9 +346,10 @@ rule mafft:
         echo $guide_alignment && \
         if [[ "$guide_alignment" == "" ]]  
         then 
-          mafft --thread -1 --auto {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          #mafft --maxiterate 1000 --localpair --thread -1 --auto {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          mafft --maxiterate 1000 --localpair --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
-          mafft --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
+          mafft --maxiterate 1000 --localpair --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
         fi
         """
@@ -279,12 +372,13 @@ rule trimal_trim:
         """
         #trimal -in {input.aligned_fasta_file} -out {output.trimmed_fasta_file} -gappyout
         #trimal -in {input.aligned_fasta_file} -out {output.trimmed_fasta_file} -automated1
+        # -gt 0.5
         trimal \
             -in {input.aligned_fasta_file} \
             -out {output.trimmed_fasta_file} \
             -htmlout \
                 $(echo {output.trimmed_fasta_file} | cut -f 1 -d '.')'_trimming_record.html' \
-            -gt 0.5 
+            -gt 0.4
 
         """
 
@@ -401,7 +495,9 @@ rule fasttree:
 
     shell:
         """
-        fasttree -lg -out {output.newick_tree_file} {input.trimmed_fasta_file}
+        #fasttree -lg -mlnni 14 -mlacc 3 -spr 200  -sprlength 1000 -out {output.newick_tree_file} {input.trimmed_fasta_file}
+        #fasttree -lg -mlnni 1000 -mlnni 14 -mlacc 3 -spr 200  -sprlength 1000 -out {output.newick_tree_file} {input.trimmed_fasta_file}
+        fasttree -lg -slow -out {output.newick_tree_file} {input.trimmed_fasta_file}
         """
 
 
@@ -474,6 +570,33 @@ rule decode_alignment:
         python3 {input.script} \
                     {input.alignment} \
                     {output.alignment} \
+                    {input.conversion_table_file} 
+        """
+
+
+rule decode_iqtree_one_ml_search_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file = \
+        'results/iqtree_one_ml_search_newick/{fasta_name}.treefile',
+        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+
+    output:
+        decoded_newick_file = 'results/iqtree_one_ml_search_newick_decoded/{fasta_name}.treefile'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
                     {input.conversion_table_file} 
         """
 
@@ -615,6 +738,30 @@ rule decode_fasttree_names:
         """
 
 
+rule iqtree_one_ml_search:
+    """
+    Perform one Maximum Likelihood (ML) tree search with IQ-TREE.
+    """
+    input:
+        phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy',
+        model_text_file = 'results/modelfinder_output/{fasta_name}.txt'
+
+    output:
+        newick_tree_file = 'results/iqtree_one_ml_search_newick/{fasta_name}.treefile'
+
+    conda:
+        'envs/iqtree_ultrafast.yaml'
+
+    shell:
+        """
+        iqtree \
+            -s {input.phylip_file} \
+            -nt AUTO \
+            -m $(cat {input.model_text_file}) \
+            -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
+        """
+
+
 
 rule iqtree_ultrafast:
     """
@@ -670,6 +817,26 @@ rule iqtree_standard:
             -nt AUTO \
             -m C20 \
             -b 100
+        """
+
+
+rule visualize_iqtree_one_ml_search:
+    """
+    Render the newick tree output by IQ-TREE as a phylogram in PDF format.
+    """
+    input:
+        script = 'workflow/scripts/visualize_fasttree.py',
+        tree_newick = 'results/iqtree_one_ml_search_newick_decoded/{fasta_name}.treefile'
+
+    output:
+        tree_pdf = 'results/iqtree_one_ml_search_pdf/{fasta_name}.pdf'
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        python3 {input.script} {input.tree_newick} {output.tree_pdf}
         """
 
 

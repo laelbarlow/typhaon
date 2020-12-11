@@ -1,0 +1,8 @@
+name: seqbouncer
+channels:
+    - anaconda
+dependencies:
+    - python=3.8
+    - biopython=1.78
+    - pandas=1.1.3
+    - numpy=1.19.1
