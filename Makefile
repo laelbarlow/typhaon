@@ -8,6 +8,9 @@ install:
 dry_run:
 	bash scripts/dry_run.sh
 
+touch:
+	bash scripts/touch_intermediate_files.sh
+
 run_fasttree:
 	nohup bash scripts/run_superfast_fasttree.sh & echo $$! > pid_nohup.txt
 
