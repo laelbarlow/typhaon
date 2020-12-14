@@ -109,7 +109,10 @@ resources
   ```
 
 - Observe the resulting sequence alignment(s) and tree topology in the results
-  directory.
+  directory. It may be useful to run the previous step multiple times with
+  different parameter settings (modify Snakefile) to optimize for your dataset.
+  This iterative refinement may be feasible on your personal computer (Linux or
+  MacOS) with less than ~200 sequences in the final alignment. 
 
 - Run [IQ-TREE](http://www.iqtree.org/doc/) with ultrafast bootstrapping.
   ```
