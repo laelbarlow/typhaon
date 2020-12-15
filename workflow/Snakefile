@@ -762,7 +762,6 @@ rule iqtree_one_ml_search:
         """
 
 
-
 rule iqtree_ultrafast:
     """
     Perform ultrafast bootstrapping with IQ-TREE.
@@ -807,11 +806,9 @@ rule iqtree_standard:
     conda:
         'envs/iqtree_ultrafast.yaml'
 
-    threads: 8
-
     shell:
         """
-        iqtree \
+        mpirun -np 8 iqtree-mpi \
             -s {input.phylip_file} \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
             -nt AUTO \
@@ -999,7 +996,7 @@ rule pb_chain_one:
 
     shell:
         """
-        mpirun -n 8 pb_mpi -d {input.phylip_file} \
+        mpirun -n 16 pb_mpi -d {input.phylip_file} \
                            -x 1 10000 \
                            -catfix C20 -gtr \
                            $(echo {output.topology_file} | cut -f 1 -d '.')
@@ -1022,7 +1019,7 @@ rule pb_chain_two:
 
     shell:
         """
-        mpirun -n 8 pb_mpi -d {input.phylip_file} \
+        mpirun -n 16 pb_mpi -d {input.phylip_file} \
                            -x 1 10000 \
                            -catfix C20 -gtr \
                            $(echo {output.topology_file} | cut -f 1 -d '.')
