@@ -1,8 +1,6 @@
 name: iqtree_ultrafast
 channels:
-    - conda-forge
     - bioconda
 dependencies:
     - python=3.8
-    - openmpi=4.0.5 
     - iqtree=2.0.3
