@@ -20,8 +20,8 @@ run_one_ml_search_iqtree:
 run_ultrafast_iqtree:
 	nohup bash scripts/run_ultrafast_iqtree.sh & echo $$! > pid_nohup.txt
 
-run_standard_iqtree:
-	nohup bash scripts/run_standard_iqtree.sh & echo $$! > pid_nohup.txt
+#run_standard_iqtree:
+#nohup bash scripts/run_standard_iqtree.sh & echo $$! > pid_nohup.txt
 
 run:
 	nohup bash scripts/run_workflow.sh & echo $$! > pid_nohup.txt
