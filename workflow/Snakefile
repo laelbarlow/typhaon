@@ -240,7 +240,7 @@ rule randomly_sample_seqs:
 
         python3 {input.script} \
                     15 \
-                    15930 \
+                    95038 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
         """
@@ -321,6 +321,7 @@ rule mafft:
     See documentation here for choosing paramaters:
         https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html
         https://mafft.cbrc.jp/alignment/software/manual/manual.html
+        https://mafft.cbrc.jp/alignment/software/dash.html
     """
     input:
         script =\
@@ -346,8 +347,8 @@ rule mafft:
         echo $guide_alignment && \
         if [[ "$guide_alignment" == "" ]]  
         then 
-          #mafft --maxiterate 1000 --localpair --thread -1 --auto {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-          mafft --maxiterate 1000 --localpair --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          mafft --maxiterate 1000 --localpair --thread -1 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          #mafft --maxiterate 1000 --localpair --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
           mafft --maxiterate 1000 --localpair --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
@@ -1063,13 +1064,15 @@ rule plot_workflow:
     """
     output:
         pdf = 'results/workflow_diagram.pdf',
-        png = 'images/workflow_diagram.png'
+        png = 'images/workflow_diagram.png',
+        png2 = 'results/workflow_filegraph.png'
     shell: 
         #'snakemake --cores 1 -p --rulegraph | dot -Tpdf > {output}'
         #snakemake --cores 1 -p --filegraph | dot -Tpdf > {output.pdf} && \
         #snakemake --cores 1 -p --filegraph | dot -Tpng > {output.png}
         """
         snakemake --cores 1 -p --rulegraph | dot -Tpdf > {output.pdf} && \
-        snakemake --cores 1 -p --rulegraph | dot -Tpng > {output.png}
+        snakemake --cores 1 -p --rulegraph | dot -Tpng > {output.png} && \
+        snakemake --cores 1 -p --filegraph | dot -Tpng > {output.png}
         """
 
