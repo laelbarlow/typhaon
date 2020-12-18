@@ -240,7 +240,7 @@ rule randomly_sample_seqs:
 
         python3 {input.script} \
                     15 \
-                    95038 \
+                    25038 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
         """
@@ -347,8 +347,8 @@ rule mafft:
         echo $guide_alignment && \
         if [[ "$guide_alignment" == "" ]]  
         then 
-          mafft --maxiterate 1000 --localpair --thread -1 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-          #mafft --maxiterate 1000 --localpair --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          #mafft --maxiterate 1000 --localpair --thread -1 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          mafft --maxiterate 1000 --localpair --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
           mafft --maxiterate 1000 --localpair --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
@@ -1000,7 +1000,7 @@ rule pb_chain_one:
     shell:
         """
         mpirun -n 16 pb_mpi -d {input.phylip_file} \
-                           -x 1 10000 \
+                           -x 1 30000 \
                            -catfix C20 -gtr \
                            $(echo {output.topology_file} | cut -f 1 -d '.')
         """
@@ -1023,7 +1023,7 @@ rule pb_chain_two:
     shell:
         """
         mpirun -n 16 pb_mpi -d {input.phylip_file} \
-                           -x 1 10000 \
+                           -x 1 30000 \
                            -catfix C20 -gtr \
                            $(echo {output.topology_file} | cut -f 1 -d '.')
         """
@@ -1050,7 +1050,7 @@ rule trace_pb_chains:
     shell:
         """
         bpcomp \
-            -x 20 1 \
+            -x 1000 10 \
             -c 0.0 \
             -o $(echo {output.consensus_tree} | cut -f 1 -d '.') \
             $(echo {input.topology_file_1} | cut -f 1 -d '.') \
@@ -1064,15 +1064,13 @@ rule plot_workflow:
     """
     output:
         pdf = 'results/workflow_diagram.pdf',
-        png = 'images/workflow_diagram.png',
-        png2 = 'results/workflow_filegraph.png'
+        png = 'images/workflow_diagram.png'
     shell: 
         #'snakemake --cores 1 -p --rulegraph | dot -Tpdf > {output}'
         #snakemake --cores 1 -p --filegraph | dot -Tpdf > {output.pdf} && \
         #snakemake --cores 1 -p --filegraph | dot -Tpng > {output.png}
         """
         snakemake --cores 1 -p --rulegraph | dot -Tpdf > {output.pdf} && \
-        snakemake --cores 1 -p --rulegraph | dot -Tpng > {output.png} && \
-        snakemake --cores 1 -p --filegraph | dot -Tpng > {output.png}
+        snakemake --cores 1 -p --rulegraph | dot -Tpng > {output.png}
         """
 
