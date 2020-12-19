@@ -141,6 +141,8 @@ rule align_subsets:
     """
     Align a FASTA file using MAFFT.
 
+    Note: Using mafft with only one thread is necessary for reproducibility.
+
     See documentation here for choosing paramaters:
         https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html
         https://mafft.cbrc.jp/alignment/software/manual/manual.html
@@ -161,7 +163,7 @@ rule align_subsets:
         mkdir -p {output.aligned_fasta_dir} && \
         for X in {input.nonredun_fasta_dir}/*.faa
             do 
-            mafft --maxiterate 1000 --localpair --thread -1 $X > \
+            mafft --maxiterate 1000 --localpair --thread 1 $X > \
                 $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'
             done
         """
@@ -240,7 +242,7 @@ rule randomly_sample_seqs:
 
         python3 {input.script} \
                     15 \
-                    25038 \
+                    15038 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
         """
@@ -318,6 +320,8 @@ rule mafft:
     """
     Align a FASTA file using MAFFT.
 
+    Note: Using mafft with only one thread is necessary for reproducibility.
+
     See documentation here for choosing paramaters:
         https://mafft.cbrc.jp/alignment/software/algorithms/algorithms.html
         https://mafft.cbrc.jp/alignment/software/manual/manual.html
@@ -347,10 +351,10 @@ rule mafft:
         echo $guide_alignment && \
         if [[ "$guide_alignment" == "" ]]  
         then 
-          #mafft --maxiterate 1000 --localpair --thread -1 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-          mafft --maxiterate 1000 --localpair --thread -1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          #mafft --maxiterate 1000 --globalpair --thread 1 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          mafft --maxiterate 1000 --localpair --thread 1 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
-          mafft --maxiterate 1000 --localpair --thread -1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
+          mafft --maxiterate 1000 --localpair --thread 1 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
         fi
         """
