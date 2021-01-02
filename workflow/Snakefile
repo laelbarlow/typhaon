@@ -244,7 +244,7 @@ rule randomly_sample_seqs:
 
         python3 {input.script} \
                     15 \
-                    15038 \
+                    49180 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
         """
@@ -356,7 +356,7 @@ rule mafft:
         if [[ "$guide_alignment" == "" ]]  
         then 
           #mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-          mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          mafft --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
           mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
