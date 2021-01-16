@@ -18,19 +18,19 @@ jobs submitted to a cluster (or webservice) for each set of sequences analyzed.
 In the absence of major sequence alignment errors, most if not all standard
 phylogetic analysis steps for a typical protein-coding gene family are quite
 routine and can therefore be programmed. This also brings the benefit of
-greater reproducibility. Available software fills this need to a large
-extent. For example, the [ete-build tool in the ETE
+greater reproducibility. Available software fills this need to a large extent.
+For example, the [ete-build tool in the ETE
 toolkit](http://etetoolkit.org/cookbook/) allows phylogenetic analysis workflow
 to be run from command line, and the [NGPhylogeny.fr
 webservice](https://ngphylogeny.fr/) provides a convenient graphical interface
 with one-click automated workflows. Such alternatives may be sufficient for
-many projects. However, these may not be readily applicable to some projects
-especially those investigating evolution of large gene superfamilies over long
-spans of time. In these cases, projects may benefit from a focus on filtering
-sequences prior to alignment, as well as application of Bayesian Inferrence
-methods for phylogenetic analysis. This workflow, Typhaon, provides these
-additional features. Typhaon is also highly reproducible, adaptable, and
-portable due to use of the [Snakemake workflow
+many projects. However, these may not be readily applicable to all projects. In
+particular, some projects investigating evolution of large gene superfamilies
+over long spans of time may benefit from a focus on filtering sequences prior
+to alignment as well as application of Bayesian Inferrence methods for
+phylogenetic analysis. This workflow, Typhaon, provides these additional
+features. Typhaon is also highly reproducible, adaptable, and portable due to
+use of the [Snakemake workflow
 manager](https://snakemake.readthedocs.io/en/stable/).
 
 
