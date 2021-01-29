@@ -7,6 +7,19 @@ import shutil
 import glob
 from snakemake.io import expand, glob_wildcards
 
+# Download software dependencies not available through package managers.
+results_dir = 'results'
+if not os.path.isdir(results_dir):
+    os.mkdir(results_dir)
+additional_software_dir = os.path.join(results_dir, 'software')
+if not os.path.isdir(additional_software_dir):
+    os.mkdir(additional_software_dir)
+sequence_bouncer_file = os.path.join(additional_software_dir,
+                                     'SequenceBouncer.py')
+if not os.path.isfile(sequence_bouncer_file):
+    subprocess.call(['curl', '-o', sequence_bouncer_file, 
+                     'https://raw.githubusercontent.com/corydunnlab/SequenceBouncer/main/SequenceBouncer.py'])
+
 # Define input file paths.
 input_fasta_dirs = glob.glob(os.path.join('resources', '*_FASTA'))
 fasta_names = [os.path.basename(x).rsplit('_', 1)[0] \
@@ -191,7 +204,7 @@ rule seqbouncer:
     scores above the 75th percentile will be excluded.
     """
     input:
-        sequence_bouncer_script = 'workflow/scripts/SequenceBouncer.py',
+        sequence_bouncer_script = sequence_bouncer_file,
         fasta_unalignment_script = 'workflow/scripts/afa_to_fa.py',
         aligned_fasta_dir =\
         'results/reduced_subsets_aligned_fasta/{fasta_name}_FASTA'
@@ -247,7 +260,7 @@ rule randomly_sample_seqs:
         # (Second argument is seed for random sampling.)
 
         python3 {input.script} \
-                    15 \
+                    5 \
                     49180 \
                     {input.fasta_dir} \
                     {output.fasta_dir}
