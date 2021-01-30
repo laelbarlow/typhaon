@@ -8,16 +8,23 @@ import glob
 import shutil
 import random
 from Bio import SeqIO
+import pandas as pd
 
 
 if __name__ == '__main__':
 
-    # Parse command line arguments.
-    cmdln = sys.argv
-    sample_size = cmdln[1]
-    seed = cmdln[2]
-    input_fasta_dir = cmdln[3]
-    output_fasta_dir = cmdln[4]
+    ## Parse command line arguments.
+    #cmdln = sys.argv
+    #sample_size = cmdln[1]
+    #seed = cmdln[2]
+    #input_fasta_dir = cmdln[3]
+    #output_fasta_dir = cmdln[4]
+
+    # Take input from snakemake.
+    sample_size = snakemake.params.sample_size
+    seed = snakemake.params.seed_instance['RandomSeed']
+    input_fasta_dir = snakemake.input[0]
+    output_fasta_dir = snakemake.output[0]
 
     # Make output directory.
     if not os.path.isdir(output_fasta_dir):

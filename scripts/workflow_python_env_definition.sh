@@ -96,6 +96,10 @@ if test "$(command -v conda)"; then
     # Activate the conda environment.
     conda activate conda_env_typhaon_snakemake_workflow
 
+    # Check snakemake version.
+    echo Snakemake version:
+    snakemake --version
+
     # Add profile path to $PATH.
     export PATH=$PATH:~/.config/snakemake/$snakemake_profile
 

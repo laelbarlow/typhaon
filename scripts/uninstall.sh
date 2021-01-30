@@ -14,8 +14,11 @@ confirm() {
 }
 
 # Remove files.
-
 confirm rm -rf ~/env_typhaon_workflow_setup_py
 
-confirm rm -rf ../typhaon
+# Remove conda environment.
+confirm conda env remove -n conda_env_typhaon_snakemake_workflow
+
+# Remove typhaon directory.
+#confirm rm -rf ../typhaon
 
