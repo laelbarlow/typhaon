@@ -58,17 +58,17 @@ rule final_results:
     Get output files from full analysis.
     """
     input:
-        expand('results/fasttree_pdf/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_fasttree/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/iqtree_ultrafast_pdf/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_iqtree_ultrafast/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/phylobayes_output/{params}/{fasta_name}_bpcomp_output.con.tre', \
+        expand('results/trace_pb_chains/{params}/{fasta_name}_bpcomp_output.con.tre', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/phylobayes_pdf/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_pb/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/phylobayes_pdf_with_boots/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_boots_on_pb/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/trimmed_fasta_reduced_decoded/{params}/{fasta_name}.afaa', \
+        expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/workflow_diagram.pdf'
 
@@ -88,9 +88,9 @@ rule superfast_fasttree:
     Get output files from partial analysis.
     """
     input:
-        expand('results/fasttree_pdf/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_fasttree/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/trimmed_fasta_reduced_decoded/{params}/{fasta_name}.afaa', \
+        expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/workflow_diagram.pdf'
 
@@ -100,9 +100,9 @@ rule one_ml_search_iqtree:
     Get output files from partial analysis.
     """
     input:
-        expand('results/iqtree_one_ml_search_pdf/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_iqtree_one_ml_search/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/trimmed_fasta_reduced_decoded/{params}/{fasta_name}.afaa', \
+        expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/workflow_diagram.pdf'
 
@@ -112,9 +112,9 @@ rule ultrafast_iqtree:
     Get output files from partial analysis.
     """
     input:
-        expand('results/iqtree_ultrafast_pdf/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_iqtree_ultrafast/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/trimmed_fasta_reduced_decoded/{params}/{fasta_name}.afaa', \
+        expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/workflow_diagram.pdf'
 
@@ -126,7 +126,7 @@ rule ultrafast_iqtree:
 #    input:
 #        expand('results/iqtree_standard_pdf/{fasta_name}.pdf', \
 #            fasta_name = fasta_names),
-#        expand('results/trimmed_fasta_reduced_decoded/{fasta_name}.afaa', \
+#        expand('results/decode_alignment/{fasta_name}.afaa', \
 #            fasta_name = fasta_names),
 #        'results/workflow_diagram.pdf'
 
@@ -140,7 +140,7 @@ rule cdhit_subsets:
         fasta_dir = 'resources/{fasta_name}_FASTA'
 
     output:
-        fasta_dir = directory('results/reduced_subsets_fasta/{fasta_name}_FASTA')
+        fasta_dir = directory('results/cdhit_subsets/{fasta_name}_FASTA')
 
     conda:
         'envs/cdhit.yaml'
@@ -173,11 +173,11 @@ rule align_subsets:
     """
     input:
         nonredun_fasta_dir =\
-        'results/reduced_subsets_fasta/{fasta_name}_FASTA'
+        'results/cdhit_subsets/{fasta_name}_FASTA'
 
     output:
         aligned_fasta_dir =\
-        directory('results/reduced_subsets_aligned_fasta/{fasta_name}_FASTA')
+        directory('results/align_subsets/{fasta_name}_FASTA')
 
     conda:
         'envs/mafft.yaml'
@@ -215,11 +215,11 @@ rule seqbouncer:
         sequence_bouncer_script = sequence_bouncer_file,
         fasta_unalignment_script = 'workflow/scripts/afa_to_fa.py',
         aligned_fasta_dir =\
-        'results/reduced_subsets_aligned_fasta/{fasta_name}_FASTA'
+        'results/align_subsets/{fasta_name}_FASTA'
 
     output:
         filtered_fasta_dir =\
-        directory('results/reduced_subsets_filtered_fasta/{fasta_name}_FASTA')
+        directory('results/seqbouncer/{fasta_name}_FASTA')
 
     conda:
         'envs/seqbouncer.yaml'
@@ -252,15 +252,15 @@ rule randomly_sample_seqs:
     """
     input:
         fasta_dir =\
-        f'results/reduced_subsets_filtered_fasta/{"{fasta_wildcard}"}_FASTA'
+        f'results/seqbouncer/{"{fasta_wildcard}"}_FASTA'
 
     output:
         fasta_dir =\
-        directory(f'results/reduced_subsets_samples_fasta/{paramspace1.wildcard_pattern}/{"{fasta_wildcard}"}_FASTA')
+        directory(f'results/randomly_sample_seqs/{paramspace1.wildcard_pattern}/{"{fasta_wildcard}"}_FASTA')
 
     params:
         seed_instance = paramspace1.instance,
-        sample_size = 15
+        sample_size = 5
 
     conda:
         'envs/randomly_sample_seqs.yaml'
@@ -277,10 +277,10 @@ rule combine_seqs:
     input:
         fasta_dir1 = 'resources/{fasta_name}_FASTA',
         fasta_dir2 = \
-        'results/reduced_subsets_samples_fasta/{seed}/{fasta_name}_FASTA'
+        'results/randomly_sample_seqs/{seed}/{fasta_name}_FASTA'
 
     output:
-        concat_fasta_file = 'results/combined_fasta/{seed}/{fasta_name}.faa'
+        concat_fasta_file = 'results/combine_seqs/{seed}/{fasta_name}.faa'
 
     shell:
         """
@@ -303,10 +303,10 @@ rule cdhit_combined:
     have been present in more than one input file.
     """
     input:
-        concat_fasta_file = 'results/combined_fasta/{seed}/{fasta_name}.faa'
+        concat_fasta_file = 'results/combine_seqs/{seed}/{fasta_name}.faa'
 
     output:
-        nonredun_fasta_file = 'results/reduced_combined_fasta/{seed}/{fasta_name}.faa'
+        nonredun_fasta_file = 'results/cdhit_combined/{seed}/{fasta_name}.faa'
 
     conda:
         'envs/cdhit.yaml'
@@ -323,10 +323,10 @@ rule cdhit_combined:
 #    Align a FASTA file using MUSCLE.
 #    """
 #    input:
-#        nonredun_fasta_file = 'results/reduced_combined_fasta/{fasta_name}.faa'
+#        nonredun_fasta_file = 'results/cdhit_combined/{fasta_name}.faa'
 #
 #    output:
-#        aligned_fasta_file = 'results/aligned_fasta/{fasta_name}.afaa'
+#        aligned_fasta_file = 'results/mafft/{fasta_name}.afaa'
 #
 #    conda:
 #        'envs/muscle.yaml'
@@ -355,10 +355,10 @@ rule mafft:
         script =\
         'workflow/scripts/remove_guide_alignment_seqs.py',
         fasta_dir = 'resources/{fasta_name}_FASTA',
-        nonredun_fasta_file = 'results/reduced_combined_fasta/{seed}/{fasta_name}.faa'
+        nonredun_fasta_file = 'results/cdhit_combined/{seed}/{fasta_name}.faa'
 
     output:
-        aligned_fasta_file = 'results/aligned_fasta/{seed}/{fasta_name}.afaa'
+        aligned_fasta_file = 'results/mafft/{seed}/{fasta_name}.afaa'
 
     conda:
         'envs/mafft.yaml'
@@ -375,8 +375,8 @@ rule mafft:
         echo $guide_alignment && \
         if [[ "$guide_alignment" == "" ]]  
         then 
-          #mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-          mafft --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          #mafft --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
           mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
@@ -389,10 +389,10 @@ rule trimal_trim:
     Trim positions from a sequence alignment using TrimAl.
     """
     input:
-        aligned_fasta_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.afaa'
+        aligned_fasta_file = 'results/code_names/{seed}/{fasta_name}.afaa'
 
     output:
-        trimmed_fasta_file = 'results/trimmed_fasta_coded/{seed}/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimal_trim/{seed}/{fasta_name}.afaa'
 
     conda:
         'envs/trimal.yaml'
@@ -417,7 +417,7 @@ rule trimal_trim:
 #    Remove non-representative sequences from an alignment using TrimAl.
 #    """
 #    input:
-#        aligned_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+#        aligned_fasta_file = 'results/trimal_trim/{fasta_name}.afaa'
 #
 #    output:
 #        trimmed_fasta_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
@@ -447,10 +447,10 @@ rule afa_to_phy:
     """
     input:
         script = 'workflow/scripts/afa_to_phy.py',
-        trimmed_fasta_coded_file = 'results/trimmed_fasta_coded/{seed}/{fasta_name}.afaa'
+        trimmed_fasta_coded_file = 'results/trimal_trim/{seed}/{fasta_name}.afaa'
 
     output:
-        phylip_file = 'results/trimmed_phylip_coded/{seed}/{fasta_name}.phy'
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     conda:
         'envs/afa_to_phy.yaml'
@@ -467,10 +467,10 @@ rule modelfinder:
     from the IQ-TREE package.
     """
     input:
-        trimmed_fasta_file = 'results/trimmed_fasta_coded/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimal_trim/{fasta_name}.afaa'
 
     output:
-        model_file = 'results/modelfinder_output/{fasta_name}.iqtree'
+        model_file = 'results/modelfinder/{fasta_name}.iqtree'
 
     conda:
         'envs/modelfinder.yaml'
@@ -492,10 +492,10 @@ rule parse_modelfinder:
     ModelFinder output, and write to a text file.
     """
     input:
-        model_file = 'results/modelfinder_output/{fasta_name}.iqtree'
+        model_file = 'results/modelfinder/{fasta_name}.iqtree'
 
     output:
-        model_text_file = 'results/modelfinder_output/{fasta_name}.txt'
+        model_text_file = 'results/modelfinder/{fasta_name}.txt'
 
     run:
         model_code = None
@@ -514,10 +514,10 @@ rule fasttree:
     Run FastTree on a trimmed sequence alignment.
     """
     input:
-        trimmed_fasta_file = 'results/trimmed_fasta_coded/{seed}/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimal_trim/{seed}/{fasta_name}.afaa'
 
     output:
-        newick_tree_file = 'results/fasttree_newick_coded/{seed}/{fasta_name}.tre'
+        newick_tree_file = 'results/fasttree/{seed}/{fasta_name}.tre'
 
     conda:
         'envs/fasttree.yaml'
@@ -536,10 +536,10 @@ rule visualize_fasttree:
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/fasttree_newick_decoded/{seed}/{fasta_name}.tre'
+        tree_newick = 'results/decode_fasttree_names/{seed}/{fasta_name}.tre'
 
     output:
-        tree_pdf = 'results/fasttree_pdf/{seed}/{fasta_name}.pdf'
+        tree_pdf = 'results/visualize_fasttree/{seed}/{fasta_name}.pdf'
 
     conda:
         'envs/visualize_fasttree.yaml'
@@ -559,11 +559,11 @@ rule code_names:
     """
     input:
         script = 'workflow/scripts/code_names.py',
-        fasta_file = 'results/aligned_fasta/{seed}/{fasta_name}.afaa'
+        fasta_file = 'results/mafft/{seed}/{fasta_name}.afaa'
 
     output:
-        coded_fasta_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.afaa',
-        conversion_table_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.table'
+        coded_fasta_file = 'results/code_names/{seed}/{fasta_name}.afaa',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     conda:
         'envs/name_replace.yaml'
@@ -584,12 +584,12 @@ rule decode_alignment:
     input:
         script = 'workflow/scripts/decode_names_in_alignment.py',
         alignment = \
-        'results/trimmed_fasta_coded/{seed}/{fasta_name}.afaa',
-        conversion_table_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.table'
+        'results/trimal_trim/{seed}/{fasta_name}.afaa',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     output:
         alignment = \
-        'results/trimmed_fasta_reduced_decoded/{seed}/{fasta_name}.afaa'
+        'results/decode_alignment/{seed}/{fasta_name}.afaa'
 
     conda:
         'envs/name_replace.yaml'
@@ -612,11 +612,11 @@ rule decode_iqtree_one_ml_search_names:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file = \
-        'results/iqtree_one_ml_search_newick/{fasta_name}.treefile',
-        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+        'results/iqtree_one_ml_search/{fasta_name}.treefile',
+        conversion_table_file = 'results/code_names/{fasta_name}.table'
 
     output:
-        decoded_newick_file = 'results/iqtree_one_ml_search_newick_decoded/{fasta_name}.treefile'
+        decoded_newick_file = 'results/decode_iqtree_one_ml_search_names/{fasta_name}.treefile'
 
     conda:
         'envs/name_replace.yaml'
@@ -639,11 +639,11 @@ rule decode_iqtree_ultrafast_names:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file = \
-        'results/iqtree_ultrafast_newick/{seed}/{fasta_name}.treefile',
-        conversion_table_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.table'
+        'results/iqtree_ultrafast/{seed}/{fasta_name}.treefile',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     output:
-        decoded_newick_file = 'results/iqtree_ultrafast_newick_decoded/{seed}/{fasta_name}.treefile'
+        decoded_newick_file = 'results/decode_iqtree_ultrafast_names/{seed}/{fasta_name}.treefile'
 
     conda:
         'envs/name_replace.yaml'
@@ -667,7 +667,7 @@ rule decode_iqtree_ultrafast_names:
 #        script = 'workflow/scripts/decode_names.py',
 #        newick_file = \
 #        'results/iqtree_standard_newick/{fasta_name}.treefile',
-#        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+#        conversion_table_file = 'results/code_names/{fasta_name}.table'
 #
 #    output:
 #        decoded_newick_file = 'results/iqtree_standard_newick_decoded/{fasta_name}.treefile'
@@ -693,12 +693,12 @@ rule decode_pb_names:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file =\
-        'results/phylobayes_output/{seed}/{fasta_name}_bpcomp_output.con.tre',
-        conversion_table_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.table'
+        'results/trace_pb_chains/{seed}/{fasta_name}_bpcomp_output.con.tre',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     output:
         decoded_newick_file =\
-        'results/phylobayes_newick_decoded/{seed}/{fasta_name}_bpcomp_output.con.tre'
+        'results/decode_pb_names/{seed}/{fasta_name}_bpcomp_output.con.tre'
 
     conda:
         'envs/name_replace.yaml'
@@ -721,12 +721,12 @@ rule decode_pb_with_boot_names:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file =\
-        'results/phylobayes_newick_with_boots/{fasta_name}.suptree',
-        conversion_table_file = 'results/aligned_fasta_coded/{fasta_name}.table'
+        'results/map_boots_on_pb/{fasta_name}.suptree',
+        conversion_table_file = 'results/code_names/{fasta_name}.table'
 
     output:
         decoded_newick_file =\
-        'results/phylobayes_newick_with_boots_decoded/{fasta_name}.suptree'
+        'results/decode_pb_with_boot_names/{fasta_name}.suptree'
 
     conda:
         'envs/name_replace.yaml'
@@ -749,11 +749,11 @@ rule decode_fasttree_names:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file = \
-        'results/fasttree_newick_coded/{seed}/{fasta_name}.tre',
-        conversion_table_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.table'
+        'results/fasttree/{seed}/{fasta_name}.tre',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     output:
-        decoded_newick_file = 'results/fasttree_newick_decoded/{seed}/{fasta_name}.tre'
+        decoded_newick_file = 'results/decode_fasttree_names/{seed}/{fasta_name}.tre'
 
     conda:
         'envs/name_replace.yaml'
@@ -772,11 +772,11 @@ rule iqtree_one_ml_search:
     Perform one Maximum Likelihood (ML) tree search with IQ-TREE.
     """
     input:
-        phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy',
-        model_text_file = 'results/modelfinder_output/{fasta_name}.txt'
+        phylip_file = 'results/afa_to_phy/{fasta_name}.phy',
+        model_text_file = 'results/modelfinder/{fasta_name}.txt'
 
     output:
-        newick_tree_file = 'results/iqtree_one_ml_search_newick/{fasta_name}.treefile'
+        newick_tree_file = 'results/iqtree_one_ml_search/{fasta_name}.treefile'
 
     conda:
         'envs/iqtree_ultrafast.yaml'
@@ -796,13 +796,13 @@ rule iqtree_ultrafast:
     Perform ultrafast bootstrapping with IQ-TREE.
     """
     input:
-        phylip_file = 'results/trimmed_phylip_coded/{seed}/{fasta_name}.phy'
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     output:
         newick_tree_file = \
-        'results/iqtree_ultrafast_newick/{seed}/{fasta_name}.treefile',
+        'results/iqtree_ultrafast/{seed}/{fasta_name}.treefile',
         bootstrap_file = \
-        'results/iqtree_ultrafast_newick/{seed}/{fasta_name}.ufboot'
+        'results/iqtree_ultrafast/{seed}/{fasta_name}.ufboot'
 
     conda:
         'envs/iqtree_ultrafast.yaml'
@@ -826,7 +826,7 @@ rule iqtree_ultrafast:
 #    ultrafast bootstrapping, at least for single-gene/protein analyses.
 #    """
 #    input:
-#        phylip_file = 'results/trimmed_phylip_coded/{fasta_name}.phy'
+#        phylip_file = 'results/afa_to_phy/{fasta_name}.phy'
 #
 #    output:
 #        newick_tree_file =\
@@ -854,10 +854,10 @@ rule visualize_iqtree_one_ml_search:
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/iqtree_one_ml_search_newick_decoded/{fasta_name}.treefile'
+        tree_newick = 'results/decode_iqtree_one_ml_search_names/{fasta_name}.treefile'
 
     output:
-        tree_pdf = 'results/iqtree_one_ml_search_pdf/{fasta_name}.pdf'
+        tree_pdf = 'results/visualize_iqtree_one_ml_search/{fasta_name}.pdf'
 
     conda:
         'envs/visualize_fasttree.yaml'
@@ -874,10 +874,10 @@ rule visualize_iqtree_ultrafast:
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/iqtree_ultrafast_newick_decoded/{seed}/{fasta_name}.treefile'
+        tree_newick = 'results/decode_iqtree_ultrafast_names/{seed}/{fasta_name}.treefile'
 
     output:
-        tree_pdf = 'results/iqtree_ultrafast_pdf/{seed}/{fasta_name}.pdf'
+        tree_pdf = 'results/visualize_iqtree_ultrafast/{seed}/{fasta_name}.pdf'
 
     conda:
         'envs/visualize_fasttree.yaml'
@@ -915,10 +915,10 @@ rule visualize_pb:
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
         tree_newick =\
-        'results/phylobayes_newick_decoded/{seed}/{fasta_name}_bpcomp_output.con.tre'
+        'results/decode_pb_names/{seed}/{fasta_name}_bpcomp_output.con.tre'
 
     output:
-        tree_pdf = 'results/phylobayes_pdf/{seed}/{fasta_name}.pdf'
+        tree_pdf = 'results/visualize_pb/{seed}/{fasta_name}.pdf'
 
     conda:
         'envs/visualize_fasttree.yaml'
@@ -937,14 +937,14 @@ rule map_boots_on_pb:
     input:
         script = 'workflow/scripts/map_boots_on_pb.py',
         pb_newick =\
-        'results/phylobayes_output/{seed}/{fasta_name}_bpcomp_output.con.tre',
+        'results/trace_pb_chains/{seed}/{fasta_name}_bpcomp_output.con.tre',
         iqtree_bootstrap_newick =\
-        'results/iqtree_ultrafast_newick/{seed}/{fasta_name}.ufboot'
+        'results/iqtree_ultrafast/{seed}/{fasta_name}.ufboot'
 
     output:
         just_boots_newick =\
-        'results/phylobayes_newick_with_boots/{seed}/{fasta_name}_boots_only.suptree',
-        newick = 'results/phylobayes_newick_with_boots/{seed}/{fasta_name}.suptree'
+        'results/map_boots_on_pb/{seed}/{fasta_name}_boots_only.suptree',
+        newick = 'results/map_boots_on_pb/{seed}/{fasta_name}.suptree'
 
     conda:
         'envs/visualize_fasttree.yaml'
@@ -967,12 +967,12 @@ rule decode_boots_on_pb:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file = \
-        'results/phylobayes_newick_with_boots/{seed}/{fasta_name}_boots_only.suptree',
-        conversion_table_file = 'results/aligned_fasta_coded/{seed}/{fasta_name}.table'
+        'results/map_boots_on_pb/{seed}/{fasta_name}_boots_only.suptree',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     output:
         decoded_newick_file = \
-        'results/phylobayes_newick_with_boots_only_decoded/{seed}/{fasta_name}_boots_only.suptree',
+        'results/visualize_boots_on_pb/{seed}/{fasta_name}_boots_only.suptree',
 
     conda:
         'envs/name_replace.yaml'
@@ -995,12 +995,12 @@ rule visualize_boots_on_pb:
     input:
         script = 'workflow/scripts/visualize_boots_on_pb.py',
         pb_newick =\
-        'results/phylobayes_newick_decoded/{seed}/{fasta_name}_bpcomp_output.con.tre',
+        'results/decode_pb_names/{seed}/{fasta_name}_bpcomp_output.con.tre',
         pb_newick_boots_only = \
-        'results/phylobayes_newick_with_boots_only_decoded/{seed}/{fasta_name}_boots_only.suptree'
+        'results/visualize_boots_on_pb/{seed}/{fasta_name}_boots_only.suptree'
 
     output:
-        tree_pdf = 'results/phylobayes_pdf_with_boots/{seed}/{fasta_name}.pdf'
+        tree_pdf = 'results/visualize_boots_on_pb/{seed}/{fasta_name}.pdf'
 
     conda:
         'envs/visualize_fasttree.yaml'
@@ -1016,11 +1016,11 @@ rule pb_chain_one:
     Run one MCMC tree-searching chain using Phylobayes.
     """
     input:
-        phylip_file = 'results/trimmed_phylip_coded/{seed}/{fasta_name}.phy'
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     output:
         topology_file =\
-        'results/phylobayes_output/{seed}/{fasta_name}_chain_1.treelist'
+        'results/pb_chains/{seed}/{fasta_name}_chain_1.treelist'
 
     conda:
         'envs/phylobayes_mpi.yaml'
@@ -1039,11 +1039,11 @@ rule pb_chain_two:
     Run one MCMC tree-searching chain using Phylobayes.
     """
     input:
-        phylip_file = 'results/trimmed_phylip_coded/{seed}/{fasta_name}.phy'
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     output:
         topology_file =\
-        'results/phylobayes_output/{seed}/{fasta_name}_chain_2.treelist'
+        'results/pb_chains/{seed}/{fasta_name}_chain_2.treelist'
 
     conda:
         'envs/phylobayes_mpi.yaml'
@@ -1064,13 +1064,13 @@ rule trace_pb_chains:
     """
     input:
         topology_file_1 =\
-        'results/phylobayes_output/{seed}/{fasta_name}_chain_1.treelist',
+        'results/pb_chains/{seed}/{fasta_name}_chain_1.treelist',
         topology_file_2 =\
-        'results/phylobayes_output/{seed}/{fasta_name}_chain_2.treelist'
+        'results/pb_chains/{seed}/{fasta_name}_chain_2.treelist'
 
     output:
         consensus_tree =\
-        'results/phylobayes_output/{seed}/{fasta_name}_bpcomp_output.con.tre'
+        'results/trace_pb_chains/{seed}/{fasta_name}_bpcomp_output.con.tre'
 
     conda:
         'envs/phylobayes_mpi.yaml'
