@@ -2,3 +2,7 @@
 *.swp
 *.snakemake
 resources/*_FASTA
+results/*
+results*
+nohup.out
+pid_nohup.txt

@@ -1,0 +1,7 @@
+
+# Define maximum number of sequences to sample from each filtered input FASTA
+# file for combined alignment (values between 15 and 35 are recommended to
+# start with). This is used in the randomly_sample_seqs directory.
+sequence_sample_size: 15
+
+
