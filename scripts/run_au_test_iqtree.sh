@@ -16,7 +16,7 @@ source scripts/determine_snakemake_env_options.sh
 source scripts/workflow_python_env_definition.sh
 
 # Run snakemake in python virtual environment.
-snakemake one_ml_search_iqtree -j 100 $env_options $profile_option $snakemake_profile
+snakemake au_test_iqtree -j 100 $env_options $profile_option $snakemake_profile
 
 # Deactivate python virtual environment.
 source scripts/deactivate_python_env.sh

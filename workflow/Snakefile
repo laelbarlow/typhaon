@@ -9,6 +9,9 @@ from snakemake.io import expand, glob_wildcards
 from snakemake.utils import Paramspace
 import pandas as pd
 
+# Define path to workflow configuration YAML file.
+configfile: 'config.yaml'
+
 # If necessary, download software dependencies not available through package
 # managers.
 results_dir = 'results'
@@ -95,14 +98,28 @@ rule superfast_fasttree:
         'results/workflow_diagram.pdf'
 
 
-rule one_ml_search_iqtree:
+rule ml_search_iqtree:
     """
     Get output files from partial analysis.
     """
     input:
-        expand('results/visualize_iqtree_one_ml_search/{params}/{fasta_name}.pdf', \
+        expand('results/visualize_iqtree_ml_search/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        'results/workflow_diagram.pdf'
+
+
+rule au_test_iqtree:
+    """
+    Get output files from partial analysis.
+    """
+    input:
+        expand('results/iqtree_au_test/{params}/{fasta_name}.iqtree', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/visualize_constrained_ml_searches/{params}/{fasta_name}', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/visualize_iqtree_ml_search/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/workflow_diagram.pdf'
 
@@ -233,7 +250,7 @@ rule seqbouncer:
               -o $(echo {output.filtered_fasta_dir}/$( basename $X ) | cut -f 1 -d '.') \
               -g 20 \
               -s 3 \
-              -k -0.5 \
+              -k -0.25 \
             && \
             python3 {input.fasta_unalignment_script} \
                        $(echo {output.filtered_fasta_dir}/$( basename $X) \
@@ -260,7 +277,7 @@ rule randomly_sample_seqs:
 
     params:
         seed_instance = paramspace1.instance,
-        sample_size = 5
+        sample_size = config['sequence_sample_size']
 
     conda:
         'envs/randomly_sample_seqs.yaml'
@@ -375,8 +392,8 @@ rule mafft:
         echo $guide_alignment && \
         if [[ "$guide_alignment" == "" ]]  
         then 
-          mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-          #mafft --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          #mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          mafft --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
           mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
@@ -603,7 +620,7 @@ rule decode_alignment:
         """
 
 
-rule decode_iqtree_one_ml_search_names:
+rule decode_iqtree_ml_search_names:
     """
     Decode names in newick tree files.
 
@@ -612,11 +629,11 @@ rule decode_iqtree_one_ml_search_names:
     input:
         script = 'workflow/scripts/decode_names.py',
         newick_file = \
-        'results/iqtree_one_ml_search/{fasta_name}.treefile',
-        conversion_table_file = 'results/code_names/{fasta_name}.table'
+        'results/iqtree_ml_search/{seed}/{fasta_name}.treefile',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     output:
-        decoded_newick_file = 'results/decode_iqtree_one_ml_search_names/{fasta_name}.treefile'
+        decoded_newick_file = 'results/decode_iqtree_ml_search_names/{seed}/{fasta_name}.treefile'
 
     conda:
         'envs/name_replace.yaml'
@@ -627,6 +644,37 @@ rule decode_iqtree_one_ml_search_names:
                     {input.newick_file} \
                     {output.decoded_newick_file} \
                     {input.conversion_table_file} 
+        """
+
+
+rule decode_constrained_ml_search_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file_dir = \
+        'results/iqtree_constrained_ml_searches/{seed}/{fasta_name}',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
+
+    output:
+        decoded_newick_file_dir = \
+        directory('results/decode_constrained_ml_search_names/{seed}/{fasta_name}')
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        mkdir -p {output.decoded_newick_file_dir}
+        for X in {input.newick_file_dir}/*.treefile; do
+        python3 {input.script} \
+                    $X \
+                    $(echo {output.decoded_newick_file_dir}/$( basename $X ) | cut -f 1 -d '.')'.tre' \
+                    {input.conversion_table_file} 
+        done
         """
 
 
@@ -767,27 +815,180 @@ rule decode_fasttree_names:
         """
 
 
-rule iqtree_one_ml_search:
+rule iqtree_ml_search:
     """
     Perform one Maximum Likelihood (ML) tree search with IQ-TREE.
     """
     input:
-        phylip_file = 'results/afa_to_phy/{fasta_name}.phy',
-        model_text_file = 'results/modelfinder/{fasta_name}.txt'
+        #model_text_file = 'results/modelfinder/{seed}/{fasta_name}.txt'
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     output:
-        newick_tree_file = 'results/iqtree_one_ml_search/{fasta_name}.treefile'
+        newick_tree_file = 'results/iqtree_ml_search/{seed}/{fasta_name}.treefile'
 
     conda:
         'envs/iqtree_ultrafast.yaml'
 
     shell:
         """
+        #    -m $(cat _input.model_text_file_) 
         iqtree \
             -s {input.phylip_file} \
             -nt AUTO \
-            -m $(cat {input.model_text_file}) \
+            -m C20 \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
+            --runs 1 \
+        """
+
+
+rule elaborate_constraint_trees:
+    """
+    Add sequence names to constraint trees for sequences that are in
+    monophyletic clades with the sequences named in the original constraint
+    trees.
+    """
+    input:
+        #decoded_ml_tree_file = \
+        #'results/decode_fasttree_names/{seed}/{fasta_name}.tre',
+        script = 'workflow/scripts/elaborate_constraint_trees.py',
+        decoded_ml_tree_file = \
+        'results/decode_iqtree_ml_search_names/{seed}/{fasta_name}.treefile',
+        constraint_tree_dir = 'resources/{fasta_name}_FASTA'
+
+    output:
+        constraint_tree_dir = \
+        directory('results/elaborate_constraint_trees/{seed}/{fasta_name}')
+
+    conda:
+        'envs/elaborate_constraint_trees.yaml'
+
+    shell:
+        """
+        mkdir -p {output.constraint_tree_dir}
+        for X in {input.constraint_tree_dir}/*.tre; do
+        python3 {input.script} {input.decoded_ml_tree_file} \
+                               $X \
+                               {output.constraint_tree_dir}/$( basename $X )
+        done
+        """
+
+
+rule code_constraint_trees:
+    """
+    Code names in input constraint trees (newick format) using the appropriate
+    conversion table.
+    """
+    input:
+        script = 'workflow/scripts/code_constraint_trees.py',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table',
+        constraint_tree_dir = 'results/elaborate_constraint_trees/{seed}/{fasta_name}'
+
+    output:
+        constraint_tree_dir = \
+        directory('results/code_constraint_trees/{seed}/{fasta_name}')
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        mkdir -p {output.constraint_tree_dir}
+        for X in {input.constraint_tree_dir}/*.tre; do
+        python3 {input.script} $X \
+                               {output.constraint_tree_dir}/$( basename $X ) \
+                               {input.conversion_table_file} 
+        done
+        """
+
+
+rule iqtree_constrained_ml_searches:
+    """
+    Perform one constrained Maximum Likelihood (ML) tree search with IQ-TREE.
+    """
+    input:
+        #model_text_file = 'results/modelfinder/{seed}/{fasta_name}.txt',
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy',
+        constraint_tree_dir = \
+        'results/code_constraint_trees/{seed}/{fasta_name}'
+
+    output:
+        constrained_tree_dir = \
+        directory('results/iqtree_constrained_ml_searches/{seed}/{fasta_name}')
+
+    conda:
+        'envs/iqtree_ultrafast.yaml'
+
+    shell:
+        """
+        #    -m $(cat _input.model_text_file_) 
+        mkdir -p {output.constrained_tree_dir}
+        for X in {input.constraint_tree_dir}/*.tre; do
+        iqtree \
+            -s {input.phylip_file} \
+            -nt AUTO \
+            -m C20 \
+            -pre {output.constrained_tree_dir}/$( basename $X ) \
+            -g $X \
+            --runs 1 
+        done
+        """
+
+
+rule concat_ml_trees:
+    """
+    Concatenate ML trees from unconstrained and constrained analyses.
+    """
+    input:
+        unconstrained_tree = \
+        'results/iqtree_ml_search/{seed}/{fasta_name}.treefile',
+        constrained_tree_dir = \
+        'results/iqtree_constrained_ml_searches/{seed}/{fasta_name}'
+
+    output:
+        concat_newick = 'results/concat_ml_trees/{seed}/{fasta_name}.tre',
+        constraint_order = \
+        'results/concat_ml_trees/{seed}/{fasta_name}_concat_order.txt'
+
+    run:
+        with open(output.concat_newick, 'w') as concat, \
+        open(output.constraint_order, 'w') as order:
+            tree_list = [input.unconstrained_tree] + \
+            glob.glob(os.path.join(input.constrained_tree_dir, '*.treefile'))
+            assert len(tree_list) > 1
+            for t in tree_list:
+                order.write(t + '\n')
+                with open(t) as th:
+                    for i in th:
+                        if not i.startswith('\n'):
+                            concat.write(i)
+
+
+rule iqtree_au_test:
+    """
+    Run an Approximately Unbiased (AU) topology test using IQ-TREE.
+    """
+    input:
+        #model_text_file = 'results/modelfinder/{seed}/{fasta_name}.txt'
+        concat_newick = 'results/concat_ml_trees/{seed}/{fasta_name}.tre',
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
+
+    output:
+        test_result = 'results/iqtree_au_test/{seed}/{fasta_name}.iqtree'
+
+    conda:
+        'envs/iqtree_ultrafast.yaml'
+
+    shell:
+        """
+        #    -m $(cat _input.model_text_file_) 
+        iqtree \
+            -s {input.phylip_file} \
+            -m C20 \
+            -z {input.concat_newick} \
+            -n 0 \
+            -zb 10000 \
+            -au \
+            -pre $(echo {output.test_result} | cut -f 1 -d '.') \
         """
 
 
@@ -848,16 +1049,16 @@ rule iqtree_ultrafast:
 #        """
 
 
-rule visualize_iqtree_one_ml_search:
+rule visualize_iqtree_ml_search:
     """
     Render the newick tree output by IQ-TREE as a phylogram in PDF format.
     """
     input:
         script = 'workflow/scripts/visualize_fasttree.py',
-        tree_newick = 'results/decode_iqtree_one_ml_search_names/{fasta_name}.treefile'
+        tree_newick = 'results/decode_iqtree_ml_search_names/{seed}/{fasta_name}.treefile'
 
     output:
-        tree_pdf = 'results/visualize_iqtree_one_ml_search/{fasta_name}.pdf'
+        tree_pdf = 'results/visualize_iqtree_ml_search/{seed}/{fasta_name}.pdf'
 
     conda:
         'envs/visualize_fasttree.yaml'
@@ -865,6 +1066,30 @@ rule visualize_iqtree_one_ml_search:
     shell:
         """
         python3 {input.script} {input.tree_newick} {output.tree_pdf}
+        """
+
+
+rule visualize_constrained_ml_searches:
+    """
+    Render the newick tree output by IQ-TREE as a phylogram in PDF format.
+    """
+    input:
+        script = 'workflow/scripts/visualize_fasttree.py',
+        tree_newick_dir = 'results/decode_constrained_ml_search_names/{seed}/{fasta_name}'
+
+    output:
+        tree_pdf_dir = \
+        directory('results/visualize_constrained_ml_searches/{seed}/{fasta_name}')
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        mkdir -p {output.tree_pdf_dir}
+        for X in {input.tree_newick_dir}/*.tre; do
+        python3 {input.script} $X $(echo {output.tree_pdf_dir}/$( basename $X ) | cut -f 1 -d '.')'.pdf'
+        done
         """
 
 

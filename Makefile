@@ -14,8 +14,11 @@ touch:
 run_fasttree:
 	nohup bash scripts/run_superfast_fasttree.sh & echo $$! > pid_nohup.txt
 
-run_one_ml_search_iqtree:
-	nohup bash scripts/run_one_ml_search_iqtree.sh & echo $$! > pid_nohup.txt
+run_ml_search_iqtree:
+	nohup bash scripts/run_ml_search_iqtree.sh & echo $$! > pid_nohup.txt
+
+run_au_test_iqtree:
+	nohup bash scripts/run_au_test_iqtree.sh & echo $$! > pid_nohup.txt
 
 run_ultrafast_iqtree:
 	nohup bash scripts/run_ultrafast_iqtree.sh & echo $$! > pid_nohup.txt

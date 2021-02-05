@@ -1,0 +1,8 @@
+name: sort_seqs_by_clade
+channels:
+    - anaconda
+    - etetoolkit
+dependencies:
+    - python=3.8
+    - biopython=1.78
+    - ete3=3.1.2
