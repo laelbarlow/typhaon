@@ -62,6 +62,8 @@ rule final_results:
     Get output files from full analysis.
     """
     input:
+        expand('results/cdhit_subsets/{fasta_name}_FASTA', \
+            fasta_name = fasta_names),
         expand('results/visualize_fasttree/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/trace_pb_chains/{params}/{fasta_name}_bpcomp_output.con.tre', \
