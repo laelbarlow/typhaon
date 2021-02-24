@@ -1,0 +1,21 @@
+
+
+
+# Define the value of the parameter, "k", used by the SequenceBouncer
+# (https://doi.org/10.1101/2020.11.24.395459) script to set the threshold for
+# identifying outliers in terms of entropy values. The sequences are ranked,
+# and the value of this k parameter is multiplied by the value of the
+# interquartile range, and the product is added to the value at the third
+# quartile. So, the default value of 1 would mean that sequences at or above
+# one interquartile range above the third quartile would be rejected as
+# outliers. 
+sequencebouncer_k: 1
+
+# Define maximum number of sequences to sample from each filtered input FASTA
+# file for combined alignment (values between 15 and 35 are recommended to
+# start with). This is used in the randomly_sample_seqs directory.
+sequence_sample_size: 15
+
+
+
+

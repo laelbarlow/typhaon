@@ -8,6 +8,9 @@ SECONDS=0
 # Set to exit immediately if any commands return an error.
 set -e
 
+# Copy example configuration YAML file.
+cp example_config.yaml config.yaml
+
 # Detect job scheduler.
 source scripts/determine_snakemake_profile.sh
 

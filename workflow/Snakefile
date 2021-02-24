@@ -73,6 +73,16 @@ rule final_results:
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/iqtree_au_test/{params}/{fasta_name}.iqtree', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/visualize_constrained_ml_searches/{params}/{fasta_name}', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/visualize_iqtree_ml_search/{params}/{fasta_name}.pdf', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/iqtree_standard_pdf/{params}/{fasta_name}.pdf', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/workflow_diagram.pdf'
 
 
@@ -136,16 +146,16 @@ rule ultrafast_iqtree:
         'results/workflow_diagram.pdf'
 
 
-#rule standard_iqtree:
-#    """
-#    Get output files from partial analysis.
-#    """
-#    input:
-#        expand('results/iqtree_standard_pdf/{fasta_name}.pdf', \
-#            fasta_name = fasta_names),
-#        expand('results/decode_alignment/{fasta_name}.afaa', \
-#            fasta_name = fasta_names),
-#        'results/workflow_diagram.pdf'
+rule standard_iqtree:
+    """
+    Get output files from partial analysis.
+    """
+    input:
+        expand('results/iqtree_standard_pdf/{params}/{fasta_name}.pdf', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        'results/workflow_diagram.pdf'
 
 
 rule cdhit_subsets:
@@ -238,6 +248,9 @@ rule seqbouncer:
         filtered_fasta_dir =\
         directory('results/seqbouncer/{fasta_name}_FASTA')
 
+    params:
+        k = config['sequencebouncer_k']
+
     conda:
         'envs/seqbouncer.yaml'
 
@@ -250,7 +263,7 @@ rule seqbouncer:
               -o $(echo {output.filtered_fasta_dir}/$( basename $X ) | cut -f 1 -d '.') \
               -g 20 \
               -s 3 \
-              -k -0.25 \
+              -k {params.k} \
             && \
             python3 {input.fasta_unalignment_script} \
                        $(echo {output.filtered_fasta_dir}/$( basename $X) \
@@ -335,26 +348,6 @@ rule cdhit_combined:
         """
 
 
-#rule muscle:
-#    """
-#    Align a FASTA file using MUSCLE.
-#    """
-#    input:
-#        nonredun_fasta_file = 'results/cdhit_combined/{fasta_name}.faa'
-#
-#    output:
-#        aligned_fasta_file = 'results/mafft/{fasta_name}.afaa'
-#
-#    conda:
-#        'envs/muscle.yaml'
-#
-#    shell:
-#        """
-#        muscle -in {input.nonredun_fasta_file} \
-#               -out {output.aligned_fasta_file}
-#        """
-
-
 rule mafft:
     """
     Align a FASTA file using MAFFT.
@@ -429,32 +422,6 @@ rule trimal_trim:
         """
 
 
-#rule trimal_reduce_seqs:
-#    """
-#    Remove non-representative sequences from an alignment using TrimAl.
-#    """
-#    input:
-#        aligned_fasta_file = 'results/trimal_trim/{fasta_name}.afaa'
-#
-#    output:
-#        trimmed_fasta_file = 'results/trimmed_fasta_reduced_coded/{fasta_name}.afaa'
-#
-#    conda:
-#        'envs/trimal.yaml'
-#
-#    shell:
-#        """
-#        trimal \
-#            -in {input.aligned_fasta_file} \
-#            -out {output.trimmed_fasta_file} \
-#            -htmlout \
-#                $(echo {output.trimmed_fasta_file} | cut -f 1 -d '.')'_trimming_record.html' \
-#                -resoverlap 0.0 \
-#                -seqoverlap 0
-#
-#        """
-
-
 rule afa_to_phy:
     """
     Convert aligned FASTA files to PHYLIP format.
@@ -494,12 +461,12 @@ rule modelfinder:
 
     shell:
         """
+        #      -madd C10,C20,C30,C40,C50,C60,LG4X,LG4M
         iqtree \
               -s {input.trimmed_fasta_file} \
               -pre $(echo {output.model_file} | cut -f 1 -d '.') \
               -nt AUTO \
-              -m MF \
-              -madd C10,C20,C30,C40,C50,C60,LG4X,LG4M
+              -m MF 
         """
 
 
@@ -528,7 +495,8 @@ rule parse_modelfinder:
 
 rule fasttree:
     """
-    Run FastTree on a trimmed sequence alignment.
+    Run FastTree on a trimmed sequence alignment
+    (http://microbesonline.org/fasttree/).
     """
     input:
         trimmed_fasta_file = 'results/trimal_trim/{seed}/{fasta_name}.afaa'
@@ -541,9 +509,9 @@ rule fasttree:
 
     shell:
         """
-        #fasttree -lg -mlnni 14 -mlacc 3 -spr 200  -sprlength 1000 -out {output.newick_tree_file} {input.trimmed_fasta_file}
-        #fasttree -lg -mlnni 1000 -mlnni 14 -mlacc 3 -spr 200  -sprlength 1000 -out {output.newick_tree_file} {input.trimmed_fasta_file}
-        fasttree -lg -slow -out {output.newick_tree_file} {input.trimmed_fasta_file}
+        fasttree -lg -sprlength 50 -mlacc 3 -slownni -slow \
+        -out {output.newick_tree_file} \
+        {input.trimmed_fasta_file}
         """
 
 
@@ -705,31 +673,31 @@ rule decode_iqtree_ultrafast_names:
         """
 
 
-#rule decode_iqtree_standard_names:
-#    """
-#    Decode names in newick tree files.
-#
-#    Necessary before visualizing trees.
-#    """
-#    input:
-#        script = 'workflow/scripts/decode_names.py',
-#        newick_file = \
-#        'results/iqtree_standard_newick/{fasta_name}.treefile',
-#        conversion_table_file = 'results/code_names/{fasta_name}.table'
-#
-#    output:
-#        decoded_newick_file = 'results/iqtree_standard_newick_decoded/{fasta_name}.treefile'
-#
-#    conda:
-#        'envs/name_replace.yaml'
-#
-#    shell:
-#        """
-#        python3 {input.script} \
-#                    {input.newick_file} \
-#                    {output.decoded_newick_file} \
-#                    {input.conversion_table_file} 
-#        """
+rule decode_iqtree_standard_names:
+    """
+    Decode names in newick tree files.
+
+    Necessary before visualizing trees.
+    """
+    input:
+        script = 'workflow/scripts/decode_names.py',
+        newick_file = \
+        'results/iqtree_standard_newick/{seed}/{fasta_name}.treefile',
+        conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
+
+    output:
+        decoded_newick_file = 'results/iqtree_standard_newick_decoded/{seed}/{fasta_name}.treefile'
+
+    conda:
+        'envs/name_replace.yaml'
+
+    shell:
+        """
+        python3 {input.script} \
+                    {input.newick_file} \
+                    {output.decoded_newick_file} \
+                    {input.conversion_table_file} 
+        """
 
 
 rule decode_pb_names:
@@ -997,6 +965,7 @@ rule iqtree_ultrafast:
     Perform ultrafast bootstrapping with IQ-TREE.
     """
     input:
+        model_text_file = 'results/modelfinder/{seed}/{fasta_name}.txt',
         phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     output:
@@ -1013,40 +982,41 @@ rule iqtree_ultrafast:
         iqtree \
             -s {input.phylip_file} \
             -nt AUTO \
-            -m C20 \
+            -m $(cat {input.model_text_file}) \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
             -B 1000 \
             -bnni
         """
 
 
-#rule iqtree_standard:
-#    """
-#    Run IQ-TREE with standard non-parametric bootstrapping. This more thorough
-#    form of bootstrapping often yields considerably different topologies than
-#    ultrafast bootstrapping, at least for single-gene/protein analyses.
-#    """
-#    input:
-#        phylip_file = 'results/afa_to_phy/{fasta_name}.phy'
-#
-#    output:
-#        newick_tree_file =\
-#        'results/iqtree_standard_newick/{fasta_name}.treefile',
-#        bootstraps_file = \
-#        'results/iqtree_standard_newick/{fasta_name}.boottrees',
-#
-#    conda:
-#        'envs/iqtree_ultrafast.yaml'
-#
-#    shell:
-#        """
-#        iqtree \
-#            -s {input.phylip_file} \
-#            -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
-#            -nt AUTO \
-#            -m C20 \
-#            -b 100
-#        """
+rule iqtree_standard:
+    """
+    Run IQ-TREE with standard non-parametric bootstrapping. This more thorough
+    form of bootstrapping often yields considerably different topologies than
+    ultrafast bootstrapping, at least for single-gene/protein analyses.
+    """
+    input:
+        model_text_file = 'results/modelfinder/{seed}/{fasta_name}.txt',
+        phylip_file = 'results/afa_to_phy/{seed}{fasta_name}.phy'
+
+    output:
+        newick_tree_file =\
+        'results/iqtree_standard_newick/{seed}/{fasta_name}.treefile',
+        bootstraps_file = \
+        'results/iqtree_standard_newick/{seed}/{fasta_name}.boottrees',
+
+    conda:
+        'envs/iqtree_ultrafast.yaml'
+
+    shell:
+        """
+        iqtree \
+            -s {input.phylip_file} \
+            -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
+            -nt AUTO \
+            -m $(cat {input.model_text_file}) \
+            -b 100
+        """
 
 
 rule visualize_iqtree_ml_search:
@@ -1113,24 +1083,24 @@ rule visualize_iqtree_ultrafast:
         """
 
 
-#rule visualize_iqtree_standard:
-#    """
-#    Render the newick tree output by IQ-TREE as a phylogram in PDF format.
-#    """
-#    input:
-#        script = 'workflow/scripts/visualize_fasttree.py',
-#        tree_newick = 'results/iqtree_standard_newick_decoded/{fasta_name}.treefile'
-#
-#    output:
-#        tree_pdf = 'results/iqtree_standard_pdf/{fasta_name}.pdf'
-#
-#    conda:
-#        'envs/visualize_fasttree.yaml'
-#
-#    shell:
-#        """
-#        python3 {input.script} {input.tree_newick} {output.tree_pdf}
-#        """
+rule visualize_iqtree_standard:
+    """
+    Render the newick tree output by IQ-TREE as a phylogram in PDF format.
+    """
+    input:
+        script = 'workflow/scripts/visualize_fasttree.py',
+        tree_newick = 'results/iqtree_standard_newick_decoded/{seed}/{fasta_name}.treefile'
+
+    output:
+        tree_pdf = 'results/iqtree_standard_pdf/{seed}{fasta_name}.pdf'
+
+    conda:
+        'envs/visualize_fasttree.yaml'
+
+    shell:
+        """
+        python3 {input.script} {input.tree_newick} {output.tree_pdf}
+        """
 
 
 rule visualize_pb:
@@ -1164,7 +1134,7 @@ rule map_boots_on_pb:
         pb_newick =\
         'results/trace_pb_chains/{seed}/{fasta_name}_bpcomp_output.con.tre',
         iqtree_bootstrap_newick =\
-        'results/iqtree_ultrafast/{seed}/{fasta_name}.ufboot'
+        'results/iqtree_standard_newick/{seed}/{fasta_name}.boottrees'
 
     output:
         just_boots_newick =\
