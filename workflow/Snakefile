@@ -995,7 +995,7 @@ rule iqtree_standard:
     """
     input:
         model_text_file = 'results/modelfinder/{seed}/{fasta_name}.txt',
-        phylip_file = 'results/afa_to_phy/{seed}{fasta_name}.phy'
+        phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     output:
         newick_tree_file =\
