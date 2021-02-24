@@ -30,6 +30,7 @@ if not os.path.isfile(sequence_bouncer_file):
 input_fasta_dirs = glob.glob(os.path.join('resources', '*_FASTA'))
 fasta_names = [os.path.basename(x).rsplit('_', 1)[0] \
                 for x in input_fasta_dirs]
+print(fasta_names)
 input_fasta_files = glob.glob(os.path.join(
                                   os.path.join('resources',
                                                '*_FASTA'), 
