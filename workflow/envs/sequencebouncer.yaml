@@ -1,4 +1,4 @@
-name: seqbouncer
+name: sequencebouncer
 channels:
     - anaconda
 dependencies:

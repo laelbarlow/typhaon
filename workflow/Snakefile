@@ -30,7 +30,6 @@ if not os.path.isfile(sequence_bouncer_file):
 input_fasta_dirs = glob.glob(os.path.join('resources', '*_FASTA'))
 fasta_names = [os.path.basename(x).rsplit('_', 1)[0] \
                 for x in input_fasta_dirs]
-print(fasta_names)
 input_fasta_files = glob.glob(os.path.join(
                                   os.path.join('resources',
                                                '*_FASTA'), 
@@ -62,27 +61,21 @@ rule final_results:
     Get output files from full analysis.
     """
     input:
-        expand('results/cdhit_subsets/{fasta_name}_FASTA', \
-            fasta_name = fasta_names),
         expand('results/visualize_fasttree/{params}/{fasta_name}.pdf', \
-            fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/trace_pb_chains/{params}/{fasta_name}_bpcomp_output.con.tre', \
-            fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/visualize_pb/{params}/{fasta_name}.pdf', \
-            fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/visualize_boots_on_pb/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/iqtree_au_test/{params}/{fasta_name}.iqtree', \
+        expand('results/visualize_pb/{params}/{fasta_name}.pdf', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/iqtree_standard_pdf/{params}/{fasta_name}.pdf', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        expand('results/visualize_boots_on_pb/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/visualize_constrained_ml_searches/{params}/{fasta_name}', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/visualize_iqtree_ml_search/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/iqtree_standard_pdf/{params}/{fasta_name}.pdf', \
-            fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/decode_alignment/{params}/{fasta_name}.afaa', \
+        expand('results/iqtree_au_test/{params}/{fasta_name}.iqtree', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/workflow_diagram.pdf'
 
@@ -225,7 +218,7 @@ rule align_subsets:
         """
 
 
-rule seqbouncer:
+rule sequencebouncer:
     """
     Filter outlier sequences using the SequenceBouncer.py script written by
     Cory D. Dunn, downloaded from GitHub
@@ -247,13 +240,13 @@ rule seqbouncer:
 
     output:
         filtered_fasta_dir =\
-        directory('results/seqbouncer/{fasta_name}_FASTA')
+        directory('results/sequencebouncer/{fasta_name}_FASTA')
 
     params:
         k = config['sequencebouncer_k']
 
     conda:
-        'envs/seqbouncer.yaml'
+        'envs/sequencebouncer.yaml'
 
     shell:
         """
@@ -283,7 +276,7 @@ rule randomly_sample_seqs:
     """
     input:
         fasta_dir =\
-        f'results/seqbouncer/{"{fasta_wildcard}"}_FASTA'
+        f'results/sequencebouncer/{"{fasta_wildcard}"}_FASTA'
 
     output:
         fasta_dir =\
@@ -395,7 +388,7 @@ rule mafft:
         """
 
 
-rule trimal_trim:
+rule trimal:
     """
     Trim positions from a sequence alignment using TrimAl.
     """
@@ -403,7 +396,7 @@ rule trimal_trim:
         aligned_fasta_file = 'results/code_names/{seed}/{fasta_name}.afaa'
 
     output:
-        trimmed_fasta_file = 'results/trimal_trim/{seed}/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimal/{seed}/{fasta_name}.afaa'
 
     conda:
         'envs/trimal.yaml'
@@ -432,7 +425,7 @@ rule afa_to_phy:
     """
     input:
         script = 'workflow/scripts/afa_to_phy.py',
-        trimmed_fasta_coded_file = 'results/trimal_trim/{seed}/{fasta_name}.afaa'
+        trimmed_fasta_coded_file = 'results/trimal/{seed}/{fasta_name}.afaa'
 
     output:
         phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
@@ -452,7 +445,7 @@ rule modelfinder:
     from the IQ-TREE package.
     """
     input:
-        trimmed_fasta_file = 'results/trimal_trim/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimal/{fasta_name}.afaa'
 
     output:
         model_file = 'results/modelfinder/{fasta_name}.iqtree'
@@ -500,7 +493,7 @@ rule fasttree:
     (http://microbesonline.org/fasttree/).
     """
     input:
-        trimmed_fasta_file = 'results/trimal_trim/{seed}/{fasta_name}.afaa'
+        trimmed_fasta_file = 'results/trimal/{seed}/{fasta_name}.afaa'
 
     output:
         newick_tree_file = 'results/fasttree/{seed}/{fasta_name}.tre'
@@ -570,7 +563,7 @@ rule decode_alignment:
     input:
         script = 'workflow/scripts/decode_names_in_alignment.py',
         alignment = \
-        'results/trimal_trim/{seed}/{fasta_name}.afaa',
+        'results/trimal/{seed}/{fasta_name}.afaa',
         conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     output:
@@ -1093,7 +1086,7 @@ rule visualize_iqtree_standard:
         tree_newick = 'results/iqtree_standard_newick_decoded/{seed}/{fasta_name}.treefile'
 
     output:
-        tree_pdf = 'results/iqtree_standard_pdf/{seed}{fasta_name}.pdf'
+        tree_pdf = 'results/iqtree_standard_pdf/{seed}/{fasta_name}.pdf'
 
     conda:
         'envs/visualize_fasttree.yaml'

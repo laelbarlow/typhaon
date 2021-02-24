@@ -1,4 +1,4 @@
-name: muscle
+name: trimal
 channels:
     - bioconda
 dependencies:

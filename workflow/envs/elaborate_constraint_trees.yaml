@@ -1,4 +1,4 @@
-name: sort_seqs_by_clade
+name: elaborate_constraint_trees
 channels:
     - anaconda
     - etetoolkit
