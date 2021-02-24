@@ -120,6 +120,11 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         cd -
         # Now you can run snakemake as: snakemake --profile sge_typhaon ...
 
+        # Copy cluster_config.yaml example file from resources directory to
+        # profile files.
+        cp resources/example_sge_cluster_config.yaml \
+        ~/.config/snakemake/sge_typhaon/cluster.yaml
+
 
     elif [ "$snakemake_profile" == "pbs-torque_typhaon" ]; then
         # Install configuration files for running on a cluster with the

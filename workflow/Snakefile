@@ -63,8 +63,6 @@ rule final_results:
     input:
         expand('results/visualize_fasttree/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/visualize_iqtree_ultrafast/{params}/{fasta_name}.pdf', \
-            fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/trace_pb_chains/{params}/{fasta_name}_bpcomp_output.con.tre', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/visualize_pb/{params}/{fasta_name}.pdf', \
