@@ -808,6 +808,7 @@ rule iqtree_ml_search:
             -m C20 \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
             --runs 1 \
+            -redo
         """
 
 
