@@ -16,7 +16,7 @@ source scripts/determine_snakemake_env_options.sh
 source scripts/workflow_python_env_definition.sh
 
 # Run snakemake in python virtual environment.
-snakemake -j 100 $env_options $profile_option $snakemake_profile --verbose
+snakemake -j 100 $env_options $profile_option $snakemake_profile --verbose --rerun-incomplete
 
 # Deactivate python virtual environment.
 source scripts/deactivate_python_env.sh
