@@ -797,6 +797,9 @@ rule iqtree_ml_search:
     output:
         newick_tree_file = 'results/iqtree_ml_search/{seed}/{fasta_name}.treefile'
 
+    params:
+        iqtree_model = config['iqtree_model']
+
     conda:
         'envs/iqtree_ultrafast.yaml'
 
@@ -806,7 +809,7 @@ rule iqtree_ml_search:
         iqtree \
             -s {input.phylip_file} \
             -nt AUTO \
-            -m C20 \
+            -m {params.iqtree_model} \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
             --runs 1 \
             -redo
@@ -822,6 +825,8 @@ rule elaborate_constraint_trees:
     input:
         #ml_tree_file = \
         #'results/fasttree/{seed}/{fasta_name}.tre'
+        #ml_tree_file = \
+        #'results/iqtree_ml_search/{seed}/{fasta_name}.treefile'
         script = 'workflow/scripts/elaborate_constraint_trees.py',
         constraint_tree_dir = \
         'results/code_constraint_trees/{seed}/{fasta_name}',
@@ -887,6 +892,9 @@ rule iqtree_constrained_ml_searches:
         constrained_tree_dir = \
         directory('results/iqtree_constrained_ml_searches/{seed}/{fasta_name}')
 
+    params:
+        iqtree_model = config['iqtree_model']
+
     conda:
         'envs/iqtree_ultrafast.yaml'
 
@@ -898,7 +906,7 @@ rule iqtree_constrained_ml_searches:
         iqtree \
             -s {input.phylip_file} \
             -nt AUTO \
-            -m C20 \
+            -m {params.iqtree_model} \
             -pre {output.constrained_tree_dir}/$( basename $X ) \
             -g $X \
             --runs 1 
@@ -947,6 +955,9 @@ rule iqtree_au_test:
     output:
         test_result = 'results/iqtree_au_test/{seed}/{fasta_name}.iqtree'
 
+    params:
+        iqtree_model = config['iqtree_model']
+
     conda:
         'envs/iqtree_ultrafast.yaml'
 
@@ -955,7 +966,7 @@ rule iqtree_au_test:
         #    -m $(cat _input.model_text_file_) 
         iqtree \
             -s {input.phylip_file} \
-            -m C20 \
+            -m {params.iqtree_model} \
             -z {input.concat_newick} \
             -n 0 \
             -zb 10000 \

@@ -16,6 +16,10 @@ sequencebouncer_k: 1
 # start with). This is used in the randomly_sample_seqs directory.
 sequence_sample_size: 15
 
+# Define the model of sequence evolution to use for IQ-TREE ML searches
+# performed for rules that do not involve bootstrapping.
+iqtree_model: "C20"
+
 
 
 
