@@ -1222,11 +1222,11 @@ rule pb_chain_one:
     output:
         topology_file =\
         'results/pb_chains/{seed}/{fasta_name}_chain_1.treelist',
-        'results/pb_chains/{seed}/{fasta_name}_chain_1.trace',
-        'results/pb_chains/{seed}/{fasta_name}_chain_1.run',
-        'results/pb_chains/{seed}/{fasta_name}_chain_1.param',
-        'results/pb_chains/{seed}/{fasta_name}_chain_1.monitor',
-        'results/pb_chains/{seed}/{fasta_name}_chain_1.chain'
+        a = 'results/pb_chains/{seed}/{fasta_name}_chain_1.trace',
+        b = 'results/pb_chains/{seed}/{fasta_name}_chain_1.run',
+        c = 'results/pb_chains/{seed}/{fasta_name}_chain_1.param',
+        d = 'results/pb_chains/{seed}/{fasta_name}_chain_1.monitor',
+        e = 'results/pb_chains/{seed}/{fasta_name}_chain_1.chain'
 
     conda:
         'envs/phylobayes_mpi.yaml'
@@ -1250,11 +1250,11 @@ rule pb_chain_two:
     output:
         topology_file =\
         'results/pb_chains/{seed}/{fasta_name}_chain_2.treelist',
-        'results/pb_chains/{seed}/{fasta_name}_chain_2.trace',
-        'results/pb_chains/{seed}/{fasta_name}_chain_2.run',
-        'results/pb_chains/{seed}/{fasta_name}_chain_2.param',
-        'results/pb_chains/{seed}/{fasta_name}_chain_2.monitor',
-        'results/pb_chains/{seed}/{fasta_name}_chain_2.chain'
+        a = 'results/pb_chains/{seed}/{fasta_name}_chain_2.trace',
+        b = 'results/pb_chains/{seed}/{fasta_name}_chain_2.run',
+        c = 'results/pb_chains/{seed}/{fasta_name}_chain_2.param',
+        d = 'results/pb_chains/{seed}/{fasta_name}_chain_2.monitor',
+        e = 'results/pb_chains/{seed}/{fasta_name}_chain_2.chain'
 
     conda:
         'envs/phylobayes_mpi.yaml'
