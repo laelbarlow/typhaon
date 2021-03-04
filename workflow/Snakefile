@@ -881,7 +881,7 @@ rule iqtree_constrained_ml_searches:
     input:
         phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy',
         constraint_tree_dir = \
-        directory('results/elaborate_constraint_trees/{seed}/{fasta_name}')
+        'results/elaborate_constraint_trees/{seed}/{fasta_name}'
 
     output:
         constrained_tree_dir = \
