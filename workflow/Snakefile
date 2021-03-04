@@ -989,7 +989,8 @@ rule iqtree_ultrafast:
             -m $(cat {input.model_text_file}) \
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
             -B 1000 \
-            -bnni
+            -bnni \
+            -redo
         """
 
 
@@ -1019,7 +1020,8 @@ rule iqtree_standard:
             -pre $(echo {output.newick_tree_file} | cut -f 1 -d '.') \
             -nt AUTO \
             -m $(cat {input.model_text_file}) \
-            -b 100
+            -b 100 \
+            -redo
         """
 
 
