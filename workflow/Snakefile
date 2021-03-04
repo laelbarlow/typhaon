@@ -89,6 +89,14 @@ rule help:
             print(rule.name)
             print(rule.docstring)
 
+ 
+rule run_code_constraint_trees:
+    """
+    """
+    input:
+        expand('results/code_constraint_trees/{params}/{fasta_name}', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns)
+
 
 rule superfast_fasttree:
     """
@@ -810,12 +818,13 @@ rule elaborate_constraint_trees:
     trees.
     """
     input:
-        #decoded_ml_tree_file = \
-        #'results/decode_fasttree_names/{seed}/{fasta_name}.tre',
+        #ml_tree_file = \
+        #'results/fasttree/{seed}/{fasta_name}.tre'
         script = 'workflow/scripts/elaborate_constraint_trees.py',
-        decoded_ml_tree_file = \
-        'results/decode_iqtree_ml_search_names/{seed}/{fasta_name}.treefile',
-        constraint_tree_dir = 'resources/{fasta_name}_FASTA'
+        constraint_tree_dir = \
+        'results/code_constraint_trees/{seed}/{fasta_name}',
+        ml_tree_file = \
+        'results/iqtree_ml_search/{seed}/{fasta_name}.treefile'
 
     output:
         constraint_tree_dir = \
@@ -828,7 +837,7 @@ rule elaborate_constraint_trees:
         """
         mkdir -p {output.constraint_tree_dir}
         for X in {input.constraint_tree_dir}/*.tre; do
-        python3 {input.script} {input.decoded_ml_tree_file} \
+        python3 {input.script} {input.ml_tree_file} \
                                $X \
                                {output.constraint_tree_dir}/$( basename $X )
         done
@@ -843,7 +852,7 @@ rule code_constraint_trees:
     input:
         script = 'workflow/scripts/code_constraint_trees.py',
         conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table',
-        constraint_tree_dir = 'results/elaborate_constraint_trees/{seed}/{fasta_name}'
+        constraint_tree_dir = 'resources/{fasta_name}_FASTA'
 
     output:
         constraint_tree_dir = \
@@ -868,10 +877,9 @@ rule iqtree_constrained_ml_searches:
     Perform one constrained Maximum Likelihood (ML) tree search with IQ-TREE.
     """
     input:
-        #model_text_file = 'results/modelfinder/{seed}/{fasta_name}.txt',
         phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy',
         constraint_tree_dir = \
-        'results/code_constraint_trees/{seed}/{fasta_name}'
+        directory('results/elaborate_constraint_trees/{seed}/{fasta_name}')
 
     output:
         constrained_tree_dir = \
