@@ -468,7 +468,8 @@ rule modelfinder:
               -s {input.trimmed_fasta_file} \
               -pre $(echo {output.model_file} | cut -f 1 -d '.') \
               -nt AUTO \
-              -m MF 
+              -m MF \
+              -redo
         """
 
 
