@@ -217,8 +217,8 @@ rule align_subsets:
         for X in {input.nonredun_fasta_dir}/*.faa
             do 
             # Accuracy:
-            mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 $X > \
-                $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'
+            #mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 $X > \
+            #    $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'
             # Speed:
             #mafft --retree 1 --maxiterate 0 --thread -1 --threadit 0 $X > \
             #    $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'
@@ -388,7 +388,9 @@ rule mafft:
         if [[ "$guide_alignment" == "" ]]  
         then 
           #mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
-          mafft --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+          #mafft --thread -1 --threadit 0 --dash --originalseqonly {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
+
+          mafft --thread -1 --threadit 0 {input.nonredun_fasta_file} > {output.aligned_fasta_file} 
         else 
           mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 --add {input.nonredun_fasta_file} $guide_alignment > {output.aligned_fasta_file} && \
           python3 {input.script} {output.aligned_fasta_file} $guide_alignment
