@@ -133,6 +133,13 @@ def get_monophyletic_seq_name_dict(full_newick_file,
     for key in sorted_keys:
         print(key + ':\t' + str(len(seq_names_by_ref_seq_name[key])))
 
+    # Check for unexpected sequence names.
+    for key in sorted_keys:
+        seq_name_list = seq_names_by_ref_seq_name[key]
+        assert 'X' not in seq_name_list, """Unexpected sequence name 'X' found
+        among sequence names for one of the clades to be included in an
+        elaborated constraint tree."""
+
     # Return dict.
     return seq_names_by_ref_seq_name
 
@@ -163,6 +170,11 @@ if __name__ == '__main__':
         for i in infh:
             i2 = i
             for key in monophyletic_seq_names.keys():
+                # Check for unexpected values.
+                assert 'X' not in monophyletic_seq_names[key], """Found
+                unexpected sequence name 'X' in clade-specific sequence name
+                list."""
+                # Replace relevant sequence name with clade in tree.
                 i2 = i2.replace(key, '(' + \
                                      ', '.join(monophyletic_seq_names[key]) + \
                                       ')')
