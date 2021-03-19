@@ -168,6 +168,12 @@ if __name__ == '__main__':
                                       ')')
             o.write(i2)
 
+    # Check for errors in the output file.
+    with open(output_newick_file) as fh:
+        assert '(X)' not in fh.read(), """Unexpected sequence name 'X' is
+        present in the output file:\n%s""" % output_newick_file
+
+
 
 
 
