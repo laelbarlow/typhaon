@@ -117,7 +117,7 @@ def get_monophyletic_seq_name_dict(full_newick_file,
         # find the node with the most child leaf nodes.
         node_w_most_leaves = sorted(nodes_of_interest, key=lambda x:\
                 len(x.get_leaves()), reverse=True)[0]
-        node_w_most_leaves.name = 'X'
+        #node_w_most_leaves.name = 'X'
         print('\n\nClade defined by sequence ' + ts + ':')
         print(node_w_most_leaves)
 
