@@ -174,10 +174,18 @@ if __name__ == '__main__':
                 assert 'X' not in monophyletic_seq_names[key], """Found
                 unexpected sequence name 'X' in clade-specific sequence name
                 list."""
+                # Define replacement string.
+                replacement_string = None
+                names = monophyletic_seq_names[key]
+                if len(names) > 1:
+                    replacement_string = '(' + \
+                                         ', '.join(monophyletic_seq_names[key]) + \
+                                          ')'
+                else:
+                    replacement_string = names[0]
+
                 # Replace relevant sequence name with clade in tree.
-                i2 = i2.replace(key, '(' + \
-                                     ', '.join(monophyletic_seq_names[key]) + \
-                                      ')')
+                i2 = i2.replace(key, replacement_string)
             o.write(i2)
 
     # Check for errors in the output file.
