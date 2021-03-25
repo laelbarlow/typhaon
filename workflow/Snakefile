@@ -77,6 +77,7 @@ rule final_results:
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/iqtree_au_test/{params}/{fasta_name}.iqtree', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        'results/summarize_au_tests/iqtree_au_test_summary.csv',
         'results/workflow_diagram.pdf'
 
 
@@ -133,6 +134,7 @@ rule au_test_iqtree:
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/visualize_iqtree_ml_search/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        'results/summarize_au_tests/iqtree_au_test_summary.csv',
         'results/workflow_diagram.pdf'
 
 
@@ -979,6 +981,23 @@ rule iqtree_au_test:
             -au \
             -pre $(echo {output.test_result} | cut -f 1 -d '.') \
         """
+
+
+rule summarize_au_tests:
+    """
+    Collate all the iqtree AU test results into a single table in CSV format.
+    """
+    input:
+        iqtree_output_files = expand('results/iqtree_au_test/{params}/{fasta_name}.iqtree', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+        concat_order_files = expand('results/concat_ml_trees/{params}/{fasta_name}_concat_order.txt', \
+            fasta_name = fasta_names, params=paramspace1.instance_patterns),
+
+    output:
+        outfile = 'results/summarize_au_tests/iqtree_au_test_summary.csv'
+
+    script:
+        'scripts/summarize_au_tests.py'
 
 
 rule iqtree_ultrafast:
