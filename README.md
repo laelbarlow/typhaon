@@ -165,6 +165,11 @@ manager](https://snakemake.readthedocs.io/en/stable/).
   make run_standard_iqtree
   ```
 
+- Run topology tests with [IQ-TREE](http://www.iqtree.org/doc/).
+  ```
+  make run_au_test_iqtree
+  ```
+
 - Run full analysis including
   [Phylobayes](https://github.com/bayesiancook/pbmpi), and map support values
   from [IQ-TREE](http://www.iqtree.org/doc/) standard bootstrapping onto
@@ -191,8 +196,8 @@ manager](https://snakemake.readthedocs.io/en/stable/).
   orthologous. So, you need a considerable amount of prior information based on
   exploratory analyses allowing you to make informed judgments about what
   sequences are likely to be orthologous before running this workflow.
-- It would be rather difficult to adapt this workflow to a project without
-  significant prior experience with Python and Linux shell scripting. 
+- A significant amount of coding (Python and Linux shell scripting) would be
+  required to adapt and customize this workflow to a specific analysis project. 
 
 ## License
 
