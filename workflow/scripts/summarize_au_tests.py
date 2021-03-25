@@ -23,9 +23,7 @@ with open(snakemake.output.outfile, 'w') as o:
         au_test_result_lines = []
         with open(i) as iqtreefh:
             section_text = \
-            iqtreefh.read()
-            .split('\nUSER TREES\n----------\n')[1]
-            .split('\nTIME STAMP\n----------\n')[0]
+            iqtreefh.read().split('\nUSER TREES\n----------\n')[1].split('\nTIME STAMP\n----------\n')[0]
 
             for l in section_text.split('\n'):
                 if au_res.match(l):
