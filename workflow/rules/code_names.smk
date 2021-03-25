@@ -17,7 +17,7 @@ rule code_names:
         conversion_table_file = 'results/code_names/{seed}/{fasta_name}.table'
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

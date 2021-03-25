@@ -18,7 +18,7 @@ rule decode_constrained_ml_search_names:
         directory('results/decode_constrained_ml_search_names/{seed}/{fasta_name}')
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

@@ -15,6 +15,6 @@ rule summarize_au_tests:
         outfile = 'results/summarize_au_tests/iqtree_au_test_summary.csv'
 
     script:
-        'scripts/summarize_au_tests.py'
+        '../scripts/summarize_au_tests.py'
 
 

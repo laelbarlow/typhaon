@@ -72,17 +72,18 @@ if test "$(command -v conda)"; then
 
 
     # Create conda environment for snakemake with mamba.
-    mamba create -c conda-forge -c bioconda -n conda_env_typhaon_snakemake_workflow snakemake
+    mamba create -c conda-forge -c bioconda \
+    -n conda_env_typhaon_snakemake_workflow \
+        snakemake \
+        numpy \
+        pandas \
+        graphviz \
+        requests \
+        pulp \
 
-    # Activate new conda environment.
-    conda activate conda_env_typhaon_snakemake_workflow
-
-    # Install additional dependencies in new conda environment.
-    conda install matplotlib
-    conda install numpy
-    conda install graphviz
-    conda install requests
-    conda install pulp
+    echo Dependencies have been installed in a new environment.
+    echo Now re-run to activate the environment. 
+    exit 1
 
   else
     # Otherwise, just activate the environment.

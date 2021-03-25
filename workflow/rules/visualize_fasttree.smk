@@ -13,7 +13,7 @@ rule visualize_fasttree:
         tree_pdf = 'results/visualize_fasttree/{seed}/{fasta_name}.pdf'
 
     conda:
-        'envs/visualize_fasttree.yaml'
+        '../envs/visualize_fasttree.yaml'
 
     shell:
         """

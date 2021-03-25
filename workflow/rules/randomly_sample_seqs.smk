@@ -20,9 +20,9 @@ rule randomly_sample_seqs:
         sample_size = config['sequence_sample_size']
 
     conda:
-        'envs/randomly_sample_seqs.yaml'
+        '../envs/randomly_sample_seqs.yaml'
 
     script:
-        'scripts/randomly_sample_seqs.py'
+        '../scripts/randomly_sample_seqs.py'
 
 

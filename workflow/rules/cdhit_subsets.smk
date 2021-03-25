@@ -13,7 +13,7 @@ rule cdhit_subsets:
         fasta_dir = directory('results/cdhit_subsets/{fasta_name}_FASTA')
 
     conda:
-        'envs/cdhit.yaml'
+        '../envs/cdhit.yaml'
 
     shell:
         """

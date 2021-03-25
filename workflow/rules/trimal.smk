@@ -12,7 +12,7 @@ rule trimal:
         trimmed_fasta_file = 'results/trimal/{seed}/{fasta_name}.afaa'
 
     conda:
-        'envs/trimal.yaml'
+        '../envs/trimal.yaml'
 
     shell:
         """

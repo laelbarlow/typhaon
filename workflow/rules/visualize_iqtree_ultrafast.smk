@@ -13,7 +13,7 @@ rule visualize_iqtree_ultrafast:
         tree_pdf = 'results/visualize_iqtree_ultrafast/{seed}/{fasta_name}.pdf'
 
     conda:
-        'envs/visualize_fasttree.yaml'
+        '../envs/visualize_fasttree.yaml'
 
     shell:
         """

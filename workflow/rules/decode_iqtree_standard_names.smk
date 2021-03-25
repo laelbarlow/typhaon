@@ -17,7 +17,7 @@ rule decode_iqtree_standard_names:
         decoded_newick_file = 'results/iqtree_standard_newick_decoded/{seed}/{fasta_name}.treefile'
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

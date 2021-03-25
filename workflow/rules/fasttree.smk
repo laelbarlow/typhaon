@@ -13,7 +13,7 @@ rule fasttree:
         newick_tree_file = 'results/fasttree/{seed}/{fasta_name}.tre'
 
     conda:
-        'envs/fasttree.yaml'
+        '../envs/fasttree.yaml'
 
     shell:
         """

@@ -16,7 +16,7 @@ rule afa_to_phy:
         phylip_file = 'results/afa_to_phy/{seed}/{fasta_name}.phy'
 
     conda:
-        'envs/afa_to_phy.yaml'
+        '../envs/afa_to_phy.yaml'
 
     shell:
         """

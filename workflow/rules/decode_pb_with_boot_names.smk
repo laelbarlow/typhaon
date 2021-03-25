@@ -18,7 +18,7 @@ rule decode_pb_with_boot_names:
         'results/decode_pb_with_boot_names/{fasta_name}.suptree'
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

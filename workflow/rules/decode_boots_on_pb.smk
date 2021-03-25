@@ -18,7 +18,7 @@ rule decode_boots_on_pb:
         'results/visualize_boots_on_pb/{seed}/{fasta_name}_boots_only.suptree',
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

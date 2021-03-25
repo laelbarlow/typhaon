@@ -1,4 +1,3 @@
-name: name_replace
 channels:
     - etetoolkit
 dependencies:

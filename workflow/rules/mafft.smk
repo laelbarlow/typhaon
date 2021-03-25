@@ -24,7 +24,7 @@ rule mafft:
         aligned_fasta_file = 'results/mafft/{seed}/{fasta_name}.afaa'
 
     conda:
-        'envs/mafft.yaml'
+        '../envs/mafft.yaml'
 
     shell:
         """

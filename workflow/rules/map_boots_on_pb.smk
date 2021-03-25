@@ -19,7 +19,7 @@ rule map_boots_on_pb:
         newick = 'results/map_boots_on_pb/{seed}/{fasta_name}.suptree'
 
     conda:
-        'envs/visualize_fasttree.yaml'
+        '../envs/visualize_fasttree.yaml'
 
     shell:
         """

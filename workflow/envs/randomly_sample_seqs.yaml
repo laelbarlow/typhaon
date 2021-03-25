@@ -1,4 +1,3 @@
-name: randomly_sample_seqs
 channels:
     - anaconda
 dependencies:

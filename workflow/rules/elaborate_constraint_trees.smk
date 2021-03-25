@@ -23,7 +23,7 @@ rule elaborate_constraint_trees:
         directory('results/elaborate_constraint_trees/{seed}/{fasta_name}')
 
     conda:
-        'envs/elaborate_constraint_trees.yaml'
+        '../envs/elaborate_constraint_trees.yaml'
 
     shell:
         """

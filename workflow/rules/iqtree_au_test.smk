@@ -21,7 +21,7 @@ rule iqtree_au_test:
         iqtree_model = config['iqtree_model']
 
     conda:
-        'envs/iqtree_ultrafast.yaml'
+        '../envs/iqtree_ultrafast.yaml'
 
     shell:
         """

@@ -1,4 +1,3 @@
-name: afa_to_phy
 channels:
     - anaconda
 dependencies:

@@ -16,7 +16,7 @@ rule iqtree_ultrafast:
         'results/iqtree_ultrafast/{seed}/{fasta_name}.ufboot'
 
     conda:
-        'envs/iqtree_ultrafast.yaml'
+        '../envs/iqtree_ultrafast.yaml'
 
     shell:
         """

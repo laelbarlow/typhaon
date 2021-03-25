@@ -16,7 +16,7 @@ rule code_constraint_trees:
         directory('results/code_constraint_trees/{seed}/{fasta_name}')
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

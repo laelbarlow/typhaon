@@ -18,7 +18,7 @@ rule decode_pb_names:
         'results/decode_pb_names/{seed}/{fasta_name}_bpcomp_output.con.tre'
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

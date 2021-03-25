@@ -17,7 +17,7 @@ rule trace_pb_chains:
         'results/trace_pb_chains/{seed}/{fasta_name}_bpcomp_output.con.tre'
 
     conda:
-        'envs/phylobayes_mpi.yaml'
+        '../envs/phylobayes_mpi.yaml'
 
     shell:
         """

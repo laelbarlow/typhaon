@@ -17,7 +17,7 @@ rule decode_fasttree_names:
         decoded_newick_file = 'results/decode_fasttree_names/{seed}/{fasta_name}.tre'
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

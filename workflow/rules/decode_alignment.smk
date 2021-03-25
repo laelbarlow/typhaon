@@ -16,7 +16,7 @@ rule decode_alignment:
         'results/decode_alignment/{seed}/{fasta_name}.afaa'
 
     conda:
-        'envs/name_replace.yaml'
+        '../envs/name_replace.yaml'
 
     shell:
         """

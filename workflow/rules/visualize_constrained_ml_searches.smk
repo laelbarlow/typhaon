@@ -14,7 +14,7 @@ rule visualize_constrained_ml_searches:
         directory('results/visualize_constrained_ml_searches/{seed}/{fasta_name}')
 
     conda:
-        'envs/visualize_fasttree.yaml'
+        '../envs/visualize_fasttree.yaml'
 
     shell:
         """

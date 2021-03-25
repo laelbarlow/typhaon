@@ -22,7 +22,7 @@ rule align_subsets:
         directory('results/align_subsets/{fasta_name}_FASTA')
 
     conda:
-        'envs/mafft.yaml'
+        '../envs/mafft.yaml'
 
     shell:
         """
@@ -30,8 +30,8 @@ rule align_subsets:
         for X in {input.nonredun_fasta_dir}/*.faa
             do 
             # Accuracy:
-            #mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 $X > \
-            #    $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'
+            mafft --maxiterate 1000 --localpair --thread -1 --threadit 0 $X > \
+                $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'
             # Speed:
             #mafft --retree 1 --maxiterate 0 --thread -1 --threadit 0 $X > \
             #    $(echo {output.aligned_fasta_dir}/$( basename $X ) | cut -f 1 -d '.')'.afaa'

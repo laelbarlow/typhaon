@@ -1,4 +1,3 @@
-name: visualize_fasttree
 channels:
     - etetoolkit
     - anaconda

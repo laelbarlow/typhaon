@@ -18,7 +18,7 @@ rule pb_chain_one:
         e = 'results/pb_chains/{seed}/{fasta_name}_chain_1.chain'
 
     conda:
-        'envs/phylobayes_mpi.yaml'
+        '../envs/phylobayes_mpi.yaml'
 
     shell:
         """

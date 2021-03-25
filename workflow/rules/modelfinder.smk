@@ -13,7 +13,7 @@ rule modelfinder:
         model_file = 'results/modelfinder/{fasta_name}.iqtree'
 
     conda:
-        'envs/modelfinder.yaml'
+        '../envs/modelfinder.yaml'
 
     shell:
         """

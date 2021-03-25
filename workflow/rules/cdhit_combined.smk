@@ -15,7 +15,7 @@ rule cdhit_combined:
         nonredun_fasta_file = 'results/cdhit_combined/{seed}/{fasta_name}.faa'
 
     conda:
-        'envs/cdhit.yaml'
+        '../envs/cdhit.yaml'
 
     shell:
         """

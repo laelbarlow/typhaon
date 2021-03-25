@@ -18,7 +18,7 @@ rule iqtree_standard:
         'results/iqtree_standard_newick/{seed}/{fasta_name}.boottrees',
 
     conda:
-        'envs/iqtree_ultrafast.yaml'
+        '../envs/iqtree_ultrafast.yaml'
 
     shell:
         """

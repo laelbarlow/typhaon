@@ -29,7 +29,7 @@ rule sequencebouncer:
         k = config['sequencebouncer_k']
 
     conda:
-        'envs/sequencebouncer.yaml'
+        '../envs/sequencebouncer.yaml'
 
     shell:
         """
