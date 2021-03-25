@@ -86,10 +86,10 @@ manager](https://snakemake.readthedocs.io/en/stable/).
       used to guide alignment of sequences in the .faa files in that directory
       (the "mafft" rule).
 
-- Prepare input Newick (phylogenetic tree topology) files in the 'resources'
-  directory. If present, these will be used as constraint trees for topology
-  tests using [IQ-TREE](http://www.iqtree.org/doc/). These files must meet the
-  following requirements:
+- Optionally, prepare input Newick (phylogenetic tree topology) files in the
+  'resources' directory. If present, these will be used as constraint trees for
+  topology tests using [IQ-TREE](http://www.iqtree.org/doc/). These files must
+  meet the following requirements:
     - Filename extensions must be '.tre'.
     - There must be at least four sequences (taxa) represented in each tree.
     - Each sequence (taxon) name in the trees must represent a different
@@ -111,7 +111,7 @@ manager](https://snakemake.readthedocs.io/en/stable/).
         ├── Protein_Family_A_FASTA
         │   ├── Orthogroup_A_GUIDE.afaa
         │   ├── Orthogroup_A1.faa
-        │   ├── Orthogroup_A2.faa
+        │   ├── Orthogroup_A2_ESSENTIAL.faa
         │   ├── Orthogroup_A3.faa
         │   ├── Orthogroup_A4.faa
         │   └── Protein_Family_A_RefSeqs_ESSENTIAL.faa
