@@ -75,8 +75,6 @@ rule final_results:
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
         expand('results/visualize_iqtree_ml_search/{params}/{fasta_name}.pdf', \
             fasta_name = fasta_names, params=paramspace1.instance_patterns),
-        expand('results/iqtree_au_test/{params}/{fasta_name}.iqtree', \
-            fasta_name = fasta_names, params=paramspace1.instance_patterns),
         'results/summarize_au_tests/iqtree_au_test_summary.csv',
         'results/workflow_diagram.pdf'
 

@@ -7,7 +7,8 @@
 Perform phylogenetic analysis of one or more sets of predicted peptide
 sequences for homologous genes using both Maximum Likelihood (ML) and Bayesian
 Inference (BI) methods, and generate a phylograms in PDF format with a
-combination of branch ML and BI support values.
+combination of branch ML and BI support values. Focus on relationships among
+clades of orthologues.
 
 
 ## Rationale
@@ -28,7 +29,7 @@ many projects. However, these may not be readily applicable to all projects. In
 particular, some projects investigating evolution of large gene superfamilies
 over long spans of time may benefit from a focus on filtering sequences prior
 to alignment as well as application of Bayesian Inferrence methods for
-phylogenetic analysis. This workflow, Typhaon, provides these additional
+phylogenetic analysis. This workflow provides these additional
 features. Typhaon is also highly reproducible, adaptable, and portable due to
 use of the [Snakemake workflow
 manager](https://snakemake.readthedocs.io/en/stable/).
@@ -36,7 +37,7 @@ manager](https://snakemake.readthedocs.io/en/stable/).
 
 ## Software requirements
 
-- Linux Sun Grid Engine (SGE) computing cluster. This has not been tested on
+- Linux Sun Grid Engine (SGE) computing cluster. This has not yet been tested on
   other cluster types. Only partial functionality is available if installed on
   a Linux or MacOS personal computer. 
 - Python3 and the [Conda package and environment
@@ -152,6 +153,15 @@ resources
   ```
   make archive
   ```
+
+## Caveats
+
+This workflow depends heavily on the assumptions you make when constructing the
+set of input FASTA files. In particular, this workflow assumes that all (or
+almost all) of the sequences within each of the input FASTA files are
+orthologous. So, you need a considerable amount of prior information based on
+exploratory analyses allowing you to make informed judgments about what
+sequences are likely to be orthologous before running this workflow.
 
 ## License
 
