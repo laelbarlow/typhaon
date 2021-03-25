@@ -1,5 +1,5 @@
 
-# Typhaon: A workflow for phylogentic analysis of protein families
+# Typhaon: A snakemake workflow for phylogentic analysis of protein families
 
 
 ## Objective
@@ -72,7 +72,7 @@ manager](https://snakemake.readthedocs.io/en/stable/).
   make dry_run
   ```
 
-- Prepare input files in the 'resources' directory. All input sequence files
+- Prepare input FASTA files in the 'resources' directory. All input sequence files
   for phylogenetic analysis must be in FASTA format and file name must end with
       the extension '.faa'.  Sets of one or more FASTA files must be assembled
       into directories with names ending with '_FASTA'. Directory and file
@@ -85,20 +85,49 @@ manager](https://snakemake.readthedocs.io/en/stable/).
       file is present with "GUIDE" in the filename, then this alignment will be
       used to guide alignment of sequences in the .faa files in that directory
       (the "mafft" rule).
-```
-resources
-├── Protein_A_FASTA
-│   ├── Protein_A_GUIDE.afaa
-│   ├── Protein_A1_homologues.faa
-│   ├── Protein_A2_homologues.faa
-│   ├── Protein_A3_homologues.faa
-│   └── Protein_A4_homologues.faa
-└── Protein_B_FASTA
-    ├── Protein_B1_homologues.faa
-    ├── Protein_B2_homologuesESSENTIAL.faa
-    ├── Protein_B3_homologues.faa
-    └── Protein_B4_homologues.faa
-```
+
+- Prepare input Newick (phylogenetic tree topology) files in the 'resources'
+  directory. If present, these will be used as constraint trees for topology
+  tests using [IQ-TREE](http://www.iqtree.org/doc/). These files must meet the
+  following requirements:
+    - Filename extensions must be '.tre'.
+    - There must be at least four sequences (taxa) represented in each tree.
+    - Each sequence (taxon) name in the trees must represent a different
+      orthogroup in the relevant protein family.
+    - Each of these reference sequences must end up in the final (filtered) set
+      of sequences aligned for analysis (so include the corresponding sequences
+      in one or more FASTA files marked as "ESSENTIAL"). 
+    - Each tree must be in valid Newick format without quotation marks around
+      taxon names.  For example, the contents of a constraint tree file could
+      look something like this:
+        ```
+        (IDW__Homo_sapiens, IDX__Homo_sapiens, (IDY__Homo_sapiens, IDZ__Homo_sapiens));
+        ```
+
+- This is an example of how the input directory and files could look:
+    ```
+    typhaon
+    └── resources
+        ├── Protein_Family_A_FASTA
+        │   ├── Orthogroup_A_GUIDE.afaa
+        │   ├── Orthogroup_A1.faa
+        │   ├── Orthogroup_A2.faa
+        │   ├── Orthogroup_A3.faa
+        │   ├── Orthogroup_A4.faa
+        │   └── Protein_Family_A_RefSeqs_ESSENTIAL.faa
+        └── Protein_Family_B_FASTA
+            ├── Constraint_tree_1.tre
+            ├── Constraint_tree_2.tre
+            ├── Orthogroup_B1_RefSeq_ESSENTIAL.faa
+            ├── Orthogroup_B1.faa
+            ├── Orthogroup_B2_ESSENTIAL.faa
+            ├── Orthogroup_B2_RefSeq_ESSENTIAL.faa
+            ├── Orthogroup_B2.faa
+            ├── Orthogroup_B3_RefSeq_ESSENTIAL.faa
+            ├── Orthogroup_B3.faa
+            ├── Orthogroup_B4_RefSeq_ESSENTIAL.faa
+            └── Orthogroup_B4.faa
+    ```
 
 - To customize parameters for any of the various software packages used in this
   workflow, modify the `workflow/Snakefile` file. This is important, as default
@@ -156,12 +185,14 @@ resources
 
 ## Caveats
 
-This workflow depends heavily on the assumptions you make when constructing the
-set of input FASTA files. In particular, this workflow assumes that all (or
-almost all) of the sequences within each of the input FASTA files are
-orthologous. So, you need a considerable amount of prior information based on
-exploratory analyses allowing you to make informed judgments about what
-sequences are likely to be orthologous before running this workflow.
+- This workflow depends heavily on the assumptions you make when constructing
+  the set of input FASTA files. In particular, this workflow assumes that all
+  (or almost all) of the sequences within each of the input FASTA files are
+  orthologous. So, you need a considerable amount of prior information based on
+  exploratory analyses allowing you to make informed judgments about what
+  sequences are likely to be orthologous before running this workflow.
+- It would be rather difficult to adapt this workflow to a project without
+  significant prior experience with Python and Linux shell scripting. 
 
 ## License
 
@@ -186,10 +217,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
-
-
-
 
 
