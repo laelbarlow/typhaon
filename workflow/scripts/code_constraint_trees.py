@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Original source: https://github.com/laelbarlow/typhaon
+# Licence notice: MIT License, copyright (c) 2020 Lael D. Barlow
+
 """Script for writing copies of newick tree files with taxon/sequence names
 replaced with short alphabetic codes from a given name conversion table.
 """

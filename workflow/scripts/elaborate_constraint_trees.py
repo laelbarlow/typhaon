@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Original source: https://github.com/laelbarlow/typhaon
+# Licence notice: MIT License, copyright (c) 2020 Lael D. Barlow
+
 """Script for replacing sequences in a representative topology with sequence
 names from corresponding monophyletic clades in a more comprehensive tree (from
 a tree search).

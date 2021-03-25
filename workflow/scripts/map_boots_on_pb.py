@@ -1,4 +1,7 @@
 #!/bin/env python3
+# Original source: https://github.com/laelbarlow/typhaon
+# Licence notice: MIT License, copyright (c) 2020 Lael D. Barlow
+
 """Script for mapping IQ-TREE bootstrap proportions onto Phylobayes (or other)
 topology.
 

@@ -1,4 +1,7 @@
 #!/bin/env python3
+# Original source: https://github.com/laelbarlow/typhaon
+# Licence notice: MIT License, copyright (c) 2020 Lael D. Barlow
+
 """Script for rendering newick trees as PDF files.
 
 ***Functions defined below are adapted from code here:

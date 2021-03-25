@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Original source: https://github.com/laelbarlow/typhaon
+# Licence notice: MIT License, copyright (c) 2020 Lael D. Barlow
+
 """Module for replacing sequence headers in FASTA files with short alphabetic
 codes, and for replacing them with the original headers in newick format tree
 files.
