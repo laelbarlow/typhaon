@@ -10,7 +10,7 @@ au_res = re.compile(r'^  \d ')
 with open(snakemake.output.outfile, 'w') as o:
 
     # Write header row.
-    o.write('Dataset,Random seed,Constraint tree,' + \
+    o.write('Dataset,Random seed (sequence sampling),Constraint tree,' + \
             'logL,deltaL,bp-RELL,p-KH,p-SH,c-ELW,p-AU\n')
 
     # Get content for subsequent rows from relevant files.
