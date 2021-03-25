@@ -1,4 +1,5 @@
 
+import os
 import re
 
 # Compile a regular expression to identify lines containing AU test info in
