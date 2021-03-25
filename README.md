@@ -1,6 +1,7 @@
 
 # Typhaon: A snakemake workflow for phylogentic analysis of protein families
 
+[![DOI](https://zenodo.org/badge/304196232.svg)](https://zenodo.org/badge/latestdoi/304196232)
 
 ## Objective
 
