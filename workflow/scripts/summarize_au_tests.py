@@ -56,7 +56,7 @@ with open(snakemake.output.outfile, 'w') as o:
         for constr_tree, au_res_row in zip(constraint_tree_filenames, au_test_result_lines):
 
             # Parse AU test result lines.
-            s = au_res_row.replace('+', '').split()
+            s = au_res_row.replace('+', '').replace(' - ', '  ').split()
 
             # Write to output file.
             components = [fasta_name,
